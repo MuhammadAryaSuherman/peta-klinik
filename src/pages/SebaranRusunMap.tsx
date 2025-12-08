@@ -1,47 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { ArrowLeft, Building2, MapPin, Users, Calendar, Phone, Mail, ExternalLink, Search, Filter } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Users, Calendar, Phone, Mail, Search, X, Layers } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
-import 'leaflet/dist/leaflet.css';
-
-// Fix Leaflet default marker icon issue
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-});
-
-// Custom marker icon
-const createCustomIcon = (color: string) => {
-  return L.divIcon({
-    html: `
-      <div style="
-        width: 36px;
-        height: 36px;
-        background: ${color};
-        border-radius: 50% 50% 50% 0;
-        transform: rotate(-45deg);
-        border: 3px solid white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      ">
-        <svg style="transform: rotate(45deg); width: 16px; height: 16px; color: white;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
-        </svg>
-      </div>
-    `,
-    className: 'custom-marker',
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -36],
-  });
-};
 
 interface Rusun {
   id: string;
@@ -60,7 +21,7 @@ interface Rusun {
   description: string;
 }
 
-// Mock data for rusun locations
+// Mock data for rusun locations in Medan
 const rusunData: Record<string, Rusun[]> = {
   'medan': [
     {
@@ -173,7 +134,7 @@ const rusunData: Record<string, Rusun[]> = {
 };
 
 const regionCenters: Record<string, { lat: number; lng: number; zoom: number; name: string }> = {
-  'medan': { lat: 3.5952, lng: 98.6722, zoom: 12, name: 'Kota Medan' },
+  'medan': { lat: 3.5952, lng: 98.6722, zoom: 11, name: 'Kota Medan' },
   'sumatera-utara': { lat: 3.3000, lng: 99.0000, zoom: 8, name: 'Sumatera Utara' },
 };
 
@@ -189,17 +150,15 @@ const statusLabels: Record<string, string> = {
   'renovasi': 'Renovasi',
 };
 
-const MapController = ({ center, zoom }: { center: [number, number]; zoom: number }) => {
-  const map = useMap();
-  map.setView(center, zoom);
-  return null;
-};
-
 const SebaranRusunMap = () => {
   const { region } = useParams<{ region: string }>();
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
   const [selectedRusun, setSelectedRusun] = useState<Rusun | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mapReady, setMapReady] = useState(false);
 
   const regionData = region && regionCenters[region] ? regionCenters[region] : regionCenters['medan'];
   const rusunList = region && rusunData[region] ? rusunData[region] : rusunData['medan'];
@@ -214,47 +173,188 @@ const SebaranRusunMap = () => {
     });
   }, [rusunList, searchQuery, statusFilter]);
 
+  // Initialize map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    // Initialize Leaflet map
+    const map = L.map(mapRef.current, {
+      center: [regionData.lat, regionData.lng],
+      zoom: regionData.zoom,
+      zoomControl: true,
+    });
+
+    // Add tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19,
+    }).addTo(map);
+
+    mapInstanceRef.current = map;
+    setMapReady(true);
+
+    // Cleanup
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  // Add markers when map is ready and data changes
+  useEffect(() => {
+    if (!mapInstanceRef.current || !mapReady) return;
+
+    const map = mapInstanceRef.current;
+
+    // Clear existing markers
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        map.removeLayer(layer);
+      }
+    });
+
+    // Add markers for filtered rusun
+    filteredRusun.forEach((rusun) => {
+      const customIcon = L.divIcon({
+        html: `
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: ${statusColors[rusun.status]};
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          ">
+            <svg style="transform: rotate(45deg); width: 14px; height: 14px;" viewBox="0 0 24 24" fill="white">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            </svg>
+          </div>
+        `,
+        className: 'custom-marker',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32],
+      });
+
+      const marker = L.marker([rusun.lat, rusun.lng], { icon: customIcon }).addTo(map);
+
+      // Create popup content
+      const popupContent = `
+        <div style="min-width: 240px; font-family: system-ui, sans-serif;">
+          <h3 style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">${rusun.name}</h3>
+          <p style="font-size: 12px; color: #666; margin-bottom: 8px;">${rusun.address}</p>
+          
+          <span style="
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 500;
+            border-radius: 4px;
+            color: white;
+            background: ${statusColors[rusun.status]};
+            margin-bottom: 8px;
+          ">${statusLabels[rusun.status]}</span>
+          
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
+            <div style="padding: 8px; background: #f3f4f6; border-radius: 6px; text-align: center;">
+              <p style="font-size: 16px; font-weight: bold; color: #0d9488;">${rusun.units}</p>
+              <p style="font-size: 10px; color: #666;">Unit</p>
+            </div>
+            <div style="padding: 8px; background: #f3f4f6; border-radius: 6px; text-align: center;">
+              <p style="font-size: 16px; font-weight: bold; color: #0d9488;">${rusun.floors}</p>
+              <p style="font-size: 10px; color: #666;">Lantai</p>
+            </div>
+            <div style="padding: 8px; background: #f3f4f6; border-radius: 6px; text-align: center;">
+              <p style="font-size: 16px; font-weight: bold; color: #0d9488;">${rusun.yearBuilt}</p>
+              <p style="font-size: 10px; color: #666;">Tahun</p>
+            </div>
+          </div>
+          
+          <p style="font-size: 12px; color: #666; margin-bottom: 12px;">${rusun.description}</p>
+          
+          <div style="font-size: 12px;">
+            <a href="tel:${rusun.contact.phone}" style="display: flex; align-items: center; gap: 6px; color: #0d9488; text-decoration: none; margin-bottom: 4px;">
+              📞 ${rusun.contact.phone}
+            </a>
+            <a href="mailto:${rusun.contact.email}" style="display: flex; align-items: center; gap: 6px; color: #0d9488; text-decoration: none;">
+              ✉️ ${rusun.contact.email}
+            </a>
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent, { maxWidth: 300 });
+
+      marker.on('click', () => {
+        setSelectedRusun(rusun);
+      });
+    });
+
+  }, [filteredRusun, mapReady]);
+
+  // Update map view when region changes
+  useEffect(() => {
+    if (mapInstanceRef.current && mapReady) {
+      mapInstanceRef.current.setView([regionData.lat, regionData.lng], regionData.zoom);
+    }
+  }, [regionData, mapReady]);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       <Navbar />
       
-      <div className="pt-20 lg:pt-24">
+      <div className="flex-1 flex flex-col pt-16 lg:pt-20">
         {/* Header */}
-        <div className="bg-card border-b border-border">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <Link
-                  to="/"
-                  className="p-2 hover:bg-secondary rounded-lg transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </Link>
-                <div>
-                  <p className="text-sm text-muted-foreground">Sebaran Rusun</p>
-                  <h1 className="text-xl lg:text-2xl font-bold text-foreground">{regionData.name}</h1>
-                </div>
+        <div className="bg-card border-b border-border px-4 py-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <Link
+                to="/"
+                className="p-2 hover:bg-secondary rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div>
+                <p className="text-xs text-muted-foreground">Sebaran Rusun</p>
+                <h1 className="text-lg font-bold text-foreground">{regionData.name}</h1>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="stat-badge">
-                  <Building2 className="w-4 h-4" />
-                  <span>{filteredRusun.length} Rusun</span>
-                </div>
-                <div className="stat-badge">
-                  <Users className="w-4 h-4" />
-                  <span>{filteredRusun.reduce((acc, r) => acc + r.units, 0)} Unit</span>
-                </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <div className="stat-badge">
+                <Building2 className="w-4 h-4" />
+                <span>{filteredRusun.length} Rusun</span>
               </div>
+              <div className="stat-badge">
+                <Users className="w-4 h-4" />
+                <span>{filteredRusun.reduce((acc, r) => acc + r.units, 0)} Unit</span>
+              </div>
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden p-2 hover:bg-secondary rounded-lg"
+              >
+                <Layers className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row h-[calc(100vh-180px)]">
+        {/* Main Content */}
+        <div className="flex-1 flex relative overflow-hidden">
           {/* Sidebar */}
-          <div className="w-full lg:w-96 bg-card border-r border-border overflow-y-auto">
+          <div className={`
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            absolute lg:relative z-20 h-full w-80 lg:w-96 bg-card border-r border-border 
+            transition-transform duration-300 flex flex-col
+          `}>
             {/* Search & Filter */}
-            <div className="p-4 border-b border-border space-y-4">
+            <div className="p-4 border-b border-border space-y-3 flex-shrink-0">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
@@ -286,186 +386,94 @@ const SebaranRusunMap = () => {
             </div>
 
             {/* Rusun List */}
-            <div className="p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {filteredRusun.map((rusun) => (
                 <div
                   key={rusun.id}
-                  onClick={() => setSelectedRusun(rusun)}
+                  onClick={() => {
+                    setSelectedRusun(rusun);
+                    setSidebarOpen(false);
+                    // Pan to marker
+                    if (mapInstanceRef.current) {
+                      mapInstanceRef.current.setView([rusun.lat, rusun.lng], 14);
+                    }
+                  }}
                   className={`clinic-card ${selectedRusun?.id === rusun.id ? 'clinic-card-active' : ''}`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground truncate">{rusun.name}</h3>
-                      <p className="text-sm text-muted-foreground truncate mt-1">
-                        <MapPin className="w-3.5 h-3.5 inline mr-1" />
+                      <h3 className="font-semibold text-foreground text-sm truncate">{rusun.name}</h3>
+                      <p className="text-xs text-muted-foreground truncate mt-1">
+                        <MapPin className="w-3 h-3 inline mr-1" />
                         {rusun.address}
                       </p>
                     </div>
                     <span
-                      className="px-2 py-1 text-xs font-medium rounded-md text-white flex-shrink-0"
+                      className="px-2 py-0.5 text-[10px] font-medium rounded text-white flex-shrink-0"
                       style={{ backgroundColor: statusColors[rusun.status] }}
                     >
                       {statusLabels[rusun.status]}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5" />
+                      <Users className="w-3 h-3" />
                       {rusun.units} Unit
                     </span>
                     <span className="flex items-center gap-1">
-                      <Building2 className="w-3.5 h-3.5" />
+                      <Building2 className="w-3 h-3" />
                       {rusun.floors} Lantai
                     </span>
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
+                      <Calendar className="w-3 h-3" />
                       {rusun.yearBuilt}
                     </span>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Mobile close button */}
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden absolute top-4 right-4 p-2 hover:bg-secondary rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          {/* Map */}
-          <div className="flex-1 relative">
-            <MapContainer
-              center={[regionData.lat, regionData.lng]}
-              zoom={regionData.zoom}
-              className="w-full h-full"
-              zoomControl={false}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <MapController center={[regionData.lat, regionData.lng]} zoom={regionData.zoom} />
-              
-              {filteredRusun.map((rusun) => (
-                <Marker
-                  key={rusun.id}
-                  position={[rusun.lat, rusun.lng]}
-                  icon={createCustomIcon(statusColors[rusun.status])}
-                  eventHandlers={{
-                    click: () => setSelectedRusun(rusun),
-                  }}
-                >
-                  <Popup>
-                    <div className="p-2 min-w-[250px]">
-                      <h3 className="font-bold text-foreground text-lg mb-2">{rusun.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">{rusun.address}</p>
-                      
-                      <div className="flex gap-2 mb-3">
-                        <span
-                          className="px-2 py-1 text-xs font-medium rounded-md text-white"
-                          style={{ backgroundColor: statusColors[rusun.status] }}
-                        >
-                          {statusLabels[rusun.status]}
-                        </span>
-                      </div>
-                      
-                      <div className="grid grid-cols-3 gap-2 text-center mb-3">
-                        <div className="p-2 bg-secondary rounded-lg">
-                          <p className="text-lg font-bold text-primary">{rusun.units}</p>
-                          <p className="text-xs text-muted-foreground">Unit</p>
-                        </div>
-                        <div className="p-2 bg-secondary rounded-lg">
-                          <p className="text-lg font-bold text-primary">{rusun.floors}</p>
-                          <p className="text-xs text-muted-foreground">Lantai</p>
-                        </div>
-                        <div className="p-2 bg-secondary rounded-lg">
-                          <p className="text-lg font-bold text-primary">{rusun.yearBuilt}</p>
-                          <p className="text-xs text-muted-foreground">Tahun</p>
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-muted-foreground mb-3">{rusun.description}</p>
-                      
-                      <div className="space-y-2 text-sm">
-                        <a href={`tel:${rusun.contact.phone}`} className="flex items-center gap-2 text-primary hover:underline">
-                          <Phone className="w-4 h-4" />
-                          {rusun.contact.phone}
-                        </a>
-                        <a href={`mailto:${rusun.contact.email}`} className="flex items-center gap-2 text-primary hover:underline">
-                          <Mail className="w-4 h-4" />
-                          {rusun.contact.email}
-                        </a>
-                      </div>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
+          {/* Map Container */}
+          <div className="flex-1 relative z-10">
+            <div ref={mapRef} className="w-full h-full" />
 
             {/* Legend */}
-            <div className="absolute bottom-6 right-6 bg-card/95 backdrop-blur-sm border border-border rounded-xl p-4 shadow-lg z-[1000]">
-              <h4 className="text-sm font-semibold text-foreground mb-3">Legenda</h4>
-              <div className="space-y-2">
+            <div className="absolute bottom-4 right-4 bg-card/95 backdrop-blur-sm border border-border rounded-xl p-3 shadow-lg z-[1000]">
+              <h4 className="text-xs font-semibold text-foreground mb-2">Legenda</h4>
+              <div className="space-y-1.5">
                 {Object.entries(statusLabels).map(([key, label]) => (
                   <div key={key} className="flex items-center gap-2">
                     <div
-                      className="w-4 h-4 rounded-full"
+                      className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: statusColors[key] }}
                     />
-                    <span className="text-sm text-muted-foreground">{label}</span>
+                    <span className="text-xs text-muted-foreground">{label}</span>
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* Mobile Sidebar Toggle */}
+            {!sidebarOpen && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden absolute top-4 left-4 bg-card border border-border rounded-lg p-3 shadow-lg z-[1000]"
+              >
+                <Layers className="w-5 h-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Detail Modal */}
-      {selectedRusun && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setSelectedRusun(null)} />
-          <div className="absolute bottom-0 left-0 right-0 bg-card border-t border-border rounded-t-2xl p-6 animate-slide-up max-h-[70vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-foreground">{selectedRusun.name}</h2>
-              <button onClick={() => setSelectedRusun(null)} className="p-2 hover:bg-secondary rounded-lg">
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <p className="text-muted-foreground mb-4">{selectedRusun.address}</p>
-            
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="p-3 bg-secondary rounded-xl text-center">
-                <p className="text-2xl font-bold text-primary">{selectedRusun.units}</p>
-                <p className="text-sm text-muted-foreground">Unit</p>
-              </div>
-              <div className="p-3 bg-secondary rounded-xl text-center">
-                <p className="text-2xl font-bold text-primary">{selectedRusun.floors}</p>
-                <p className="text-sm text-muted-foreground">Lantai</p>
-              </div>
-              <div className="p-3 bg-secondary rounded-xl text-center">
-                <p className="text-2xl font-bold text-primary">{selectedRusun.yearBuilt}</p>
-                <p className="text-sm text-muted-foreground">Tahun</p>
-              </div>
-            </div>
-            
-            <p className="text-muted-foreground mb-4">{selectedRusun.description}</p>
-            
-            <div className="space-y-3">
-              <a
-                href={`tel:${selectedRusun.contact.phone}`}
-                className="flex items-center gap-3 p-3 bg-secondary rounded-xl hover:bg-primary/10 transition-colors"
-              >
-                <Phone className="w-5 h-5 text-primary" />
-                <span>{selectedRusun.contact.phone}</span>
-              </a>
-              <a
-                href={`mailto:${selectedRusun.contact.email}`}
-                className="flex items-center gap-3 p-3 bg-secondary rounded-xl hover:bg-primary/10 transition-colors"
-              >
-                <Mail className="w-5 h-5 text-primary" />
-                <span>{selectedRusun.contact.email}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
