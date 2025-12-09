@@ -1,14 +1,16 @@
-import { ArrowRight, Building2, MapPin, Users, FileCheck } from 'lucide-react';
+import { ArrowRight, Building2, MapPin, Users, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import sumateraMapBg from '@/assets/sumatera-map-bg.jpg';
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-accent/30" />
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-      }} />
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${sumateraMapBg})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/85 to-background/70" />
 
       {/* Floating Elements */}
       <div className="absolute top-1/4 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-soft" />
@@ -18,7 +20,7 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium animate-fade-in backdrop-blur-sm">
               <Building2 className="w-4 h-4" />
               <span>Kementerian Perumahan & Kawasan Permukiman</span>
             </div>
@@ -35,7 +37,7 @@ const HeroSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <Link
-                to="/peta/sebaran-rusun/medan"
+                to="/peta/penerima-bsps/medan"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary-hover transition-all shadow-lg hover:shadow-xl hover:shadow-primary/20"
               >
                 <MapPin className="w-5 h-5" />
@@ -44,7 +46,7 @@ const HeroSection = () => {
               </Link>
               <Link
                 to="/informasi/tentang"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-secondary-foreground font-semibold rounded-xl hover:bg-secondary/80 transition-all border border-border"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-secondary-foreground font-semibold rounded-xl hover:bg-secondary/80 transition-all border border-border backdrop-blur-sm"
               >
                 Pelajari Lebih Lanjut
               </Link>
@@ -83,15 +85,15 @@ const HeroSection = () => {
                 delay="0.1s"
               />
               <FeatureCard
-                icon={<Users className="w-6 h-6" />}
-                title="Bantuan SDGs"
-                description="Program bantuan pembangunan berkelanjutan"
+                icon={<Gift className="w-6 h-6" />}
+                title="Penerima BSPS"
+                description="Bantuan stimulan perumahan swadaya"
                 delay="0.2s"
               />
               <FeatureCard
-                icon={<FileCheck className="w-6 h-6" />}
-                title="Simulasi KPR"
-                description="Hitung kemampuan kredit rumah Anda"
+                icon={<Users className="w-6 h-6" />}
+                title="Sosialisasi"
+                description="Kegiatan edukasi dan sosialisasi"
                 delay="0.3s"
               />
             </div>
@@ -109,7 +111,7 @@ const FeatureCard = ({ icon, title, description, delay }: {
   delay: string;
 }) => (
   <div
-    className="p-6 bg-card rounded-2xl border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group animate-slide-up"
+    className="p-6 bg-card/80 backdrop-blur-sm rounded-2xl border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group animate-slide-up"
     style={{ animationDelay: delay }}
   >
     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">

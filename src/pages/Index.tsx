@@ -4,8 +4,12 @@ import Sidebar from '@/components/Sidebar';
 import ClinicMap from '@/components/ClinicMap';
 import ClinicDetail from '@/components/ClinicDetail';
 import MapLegend from '@/components/MapLegend';
-import { clinics, provinces, cities } from '@/data/mockData';
-import { FilterState, Clinic } from '@/types/clinic';
+import { FilterState, Clinic, Province, City } from '@/types/clinic';
+
+// Placeholder data - will be replaced with API calls
+const clinics: Clinic[] = [];
+const provinces: Province[] = [];
+const cities: City[] = [];
 
 const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
