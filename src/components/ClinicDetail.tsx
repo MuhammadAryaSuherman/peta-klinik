@@ -13,7 +13,6 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Clinic, AuditLog, CATEGORY_LABELS, CATEGORY_COLORS } from '@/types/clinic';
-import { auditLogs } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -21,6 +20,9 @@ interface ClinicDetailProps {
   clinic: Clinic;
   onClose: () => void;
 }
+
+// Placeholder - will be replaced with API calls
+const auditLogs: AuditLog[] = [];
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('id-ID', {

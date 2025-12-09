@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChevronDown, Menu, X, Building2, MapPin, Home, FileText, Info, Calculator, Palette, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ChevronDown, Menu, X, Building2, MapPin, Home, Info, Palette, LogIn, BookOpen, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SubMenuItem {
@@ -17,16 +17,6 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  {
-    label: 'Aplikasi Jati',
-    icon: <FileText className="w-4 h-4" />,
-    subItems: [
-      { label: 'Sejati', href: '/aplikasi/sejati' },
-      { label: 'Sinoman', href: '/aplikasi/sinoman' },
-      { label: 'Senyum', href: '/aplikasi/senyum' },
-      { label: 'Ngemong', href: '/aplikasi/ngemong' },
-    ],
-  },
   {
     label: 'Kondisi Perumahan',
     icon: <Home className="w-4 h-4" />,
@@ -45,24 +35,29 @@ const menuItems: MenuItem[] = [
           { label: 'Sumatera Utara', href: '/peta/kawasan-kumuh/sumatera-utara' },
         ],
       },
-      { label: 'Sebaran Bantuan SDGs', href: '/peta/sebaran-sdgs' },
-    ],
-  },
-  {
-    label: 'Info KPR',
-    icon: <Calculator className="w-4 h-4" />,
-    subItems: [
-      { label: 'Simulasi KPR', href: '/info-kpr/simulasi' },
-      { label: 'Sikumbang', href: '/info-kpr/sikumbang' },
+      {
+        label: 'Penerima Bantuan BSPS',
+        subItems: [
+          { label: 'Medan', href: '/peta/penerima-bsps/medan' },
+          { label: 'Sumatera Utara', href: '/peta/penerima-bsps/sumatera-utara' },
+        ],
+      },
     ],
   },
   {
     label: 'Bank Desain',
     icon: <Palette className="w-4 h-4" />,
-    subItems: [
-      { label: 'Desain Rumah', href: '/bank-desain/rumah' },
-      { label: 'Desain Rusun', href: '/bank-desain/rusun' },
-    ],
+    href: '/bank-desain',
+  },
+  {
+    label: 'Sosialisasi Klinik PKP',
+    icon: <BookOpen className="w-4 h-4" />,
+    href: '/sosialisasi-klinik-pkp',
+  },
+  {
+    label: 'Penerimaan BSPS',
+    icon: <Gift className="w-4 h-4" />,
+    href: '/penerimaan-bsps',
   },
   {
     label: 'Informasi',
@@ -82,7 +77,18 @@ const DropdownMenu = ({ item, isOpen, onMouseEnter, onMouseLeave }: {
   onMouseLeave: () => void;
 }) => {
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
-  const navigate = useNavigate();
+
+  if (item.href) {
+    return (
+      <Link
+        to={item.href}
+        className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-primary/10 hover:text-primary"
+      >
+        {item.icon}
+        <span>{item.label}</span>
+      </Link>
+    );
+  }
 
   return (
     <div
@@ -107,7 +113,7 @@ const DropdownMenu = ({ item, isOpen, onMouseEnter, onMouseLeave }: {
 
       {isOpen && item.subItems && (
         <div className="absolute top-full left-0 pt-2 z-50 animate-fade-in">
-          <div className="bg-card border border-border rounded-xl shadow-xl py-2 min-w-[220px] backdrop-blur-lg">
+          <div className="bg-card border border-border rounded-xl shadow-xl py-2 min-w-[220px]">
             {item.subItems.map((subItem, idx) => (
               <div
                 key={idx}
@@ -131,7 +137,7 @@ const DropdownMenu = ({ item, isOpen, onMouseEnter, onMouseLeave }: {
 
                 {activeSubMenu === subItem.label && subItem.subItems && (
                   <div className="absolute left-full top-0 ml-1 z-50 animate-fade-in">
-                    <div className="bg-card border border-border rounded-xl shadow-xl py-2 min-w-[180px] backdrop-blur-lg">
+                    <div className="bg-card border border-border rounded-xl shadow-xl py-2 min-w-[180px]">
                       {subItem.subItems.map((nestedItem, nestedIdx) => (
                         <Link
                           key={nestedIdx}
@@ -186,13 +192,20 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden lg:flex items-center gap-4">
+          {/* CTA Buttons */}
+          <div className="hidden lg:flex items-center gap-3">
             <Link
               to="/informasi/kontak"
               className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary-hover transition-colors shadow-md hover:shadow-lg"
             >
               Hubungi Kami
+            </Link>
+            <Link
+              to="/login"
+              className="p-2.5 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors border border-border"
+              title="Login"
+            >
+              <LogIn className="w-5 h-5" />
             </Link>
           </div>
 
@@ -213,13 +226,22 @@ const Navbar = () => {
             {menuItems.map((item) => (
               <MobileMenuItem key={item.label} item={item} onClose={() => setIsMobileMenuOpen(false)} />
             ))}
-            <Link
-              to="/informasi/kontak"
-              className="block w-full mt-4 px-5 py-3 bg-primary text-primary-foreground text-center text-sm font-semibold rounded-lg"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Hubungi Kami
-            </Link>
+            <div className="flex gap-2 pt-4">
+              <Link
+                to="/informasi/kontak"
+                className="flex-1 px-5 py-3 bg-primary text-primary-foreground text-center text-sm font-semibold rounded-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Hubungi Kami
+              </Link>
+              <Link
+                to="/login"
+                className="p-3 bg-secondary text-secondary-foreground rounded-lg border border-border"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <LogIn className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </div>
       )}
@@ -230,6 +252,19 @@ const Navbar = () => {
 const MobileMenuItem = ({ item, onClose }: { item: MenuItem; onClose: () => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedSubItem, setExpandedSubItem] = useState<string | null>(null);
+
+  if (item.href) {
+    return (
+      <Link
+        to={item.href}
+        onClick={onClose}
+        className="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b border-border/50"
+      >
+        {item.icon}
+        <span>{item.label}</span>
+      </Link>
+    );
+  }
 
   return (
     <div className="border-b border-border/50 last:border-0">
