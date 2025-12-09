@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, Menu, X, Building2, MapPin, Home, Info, Palette, LogIn, BookOpen, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface SubMenuItem {
   label: string;
@@ -170,12 +171,12 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-glow">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg">
               <Building2 className="w-5 h-5 lg:w-6 lg:h-6 text-primary-foreground" />
             </div>
             <div className="hidden sm:block">
-              <p className="text-[10px] lg:text-xs text-muted-foreground font-medium uppercase tracking-wider">Kementerian PKP</p>
-              <h1 className="text-sm lg:text-base font-bold text-foreground">KLINIK BP3KP</h1>
+              <p className="text-[10px] lg:text-xs text-muted-foreground font-medium uppercase tracking-wider">BP3KP Sumatera II</p>
+              <h1 className="text-sm lg:text-base font-bold text-foreground">Klinik PKP</h1>
             </div>
           </Link>
 
@@ -193,7 +194,8 @@ const Navbar = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
+            <ThemeToggle />
             <Link
               to="/informasi/kontak"
               className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary-hover transition-colors shadow-md hover:shadow-lg"
@@ -210,12 +212,15 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-accent transition-colors"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex lg:hidden items-center gap-2">
+            <ThemeToggle />
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-lg hover:bg-accent transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
