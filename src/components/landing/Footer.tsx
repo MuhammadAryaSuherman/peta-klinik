@@ -9,16 +9,16 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg">
                 <Building2 className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
-                <p className="text-xs text-sidebar-foreground/60 uppercase tracking-wider">Kementerian PKP</p>
-                <h3 className="font-bold">KLINIK BP3KP</h3>
+                <p className="text-xs text-sidebar-foreground/60 uppercase tracking-wider">BP3KP Sumatera II</p>
+                <h3 className="font-bold">Klinik PKP</h3>
               </div>
             </div>
             <p className="text-sm text-sidebar-foreground/70 leading-relaxed">
-              Layanan konsultasi dan informasi terpadu untuk perumahan, permukiman, dan kawasan kumuh di Indonesia.
+              Layanan konsultasi dan informasi terpadu untuk perumahan, permukiman, dan kawasan kumuh di wilayah Sumatera.
             </p>
             <div className="flex gap-3">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, index) => (
@@ -40,9 +40,9 @@ const Footer = () => {
               {[
                 { label: 'Sebaran Rusun', href: '/peta/sebaran-rusun/medan' },
                 { label: 'Kawasan Kumuh', href: '/peta/kawasan-kumuh/medan' },
-                { label: 'Bantuan SDGs', href: '/peta/sebaran-sdgs' },
-                { label: 'Simulasi KPR', href: '/info-kpr/simulasi' },
-                { label: 'Bank Desain', href: '/bank-desain/rumah' },
+                { label: 'Penerima BSPS', href: '/peta/penerima-bsps/medan' },
+                { label: 'Bank Desain', href: '/bank-desain' },
+                { label: 'Sosialisasi', href: '/sosialisasi-klinik-pkp' },
               ].map((link, index) => (
                 <li key={index}>
                   <Link
@@ -111,7 +111,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-sidebar-foreground/60">
-              © 2024 Klinik BP3KP. All rights reserved.
+              © 2024 Klinik PKP - BP3KP Sumatera II. All rights reserved.
             </p>
             <p className="text-sm text-sidebar-foreground/60">
               Kementerian Perumahan dan Kawasan Permukiman Republik Indonesia
