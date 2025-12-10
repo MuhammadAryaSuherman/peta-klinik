@@ -331,33 +331,44 @@ const PenerimaanBSPS = () => {
 
           {/* Info Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-16">
-            <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group">
+            <button 
+              onClick={() => document.getElementById('persyaratan')?.scrollIntoView({ behavior: 'smooth' })}
+              className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group text-left"
+            >
               <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground mb-4 group-hover:scale-110 transition-transform">
                 <ClipboardList className="w-7 h-7" />
               </div>
               <h3 className="font-semibold text-foreground text-lg mb-2">Persyaratan</h3>
               <p className="text-muted-foreground">Informasi lengkap persyaratan untuk mendaftar program BSPS.</p>
-            </div>
+            </button>
 
-            <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group" style={{ transitionDelay: '0.1s' }}>
+            <button 
+              onClick={() => document.getElementById('prosedur')?.scrollIntoView({ behavior: 'smooth' })}
+              className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group text-left"
+              style={{ transitionDelay: '0.1s' }}
+            >
               <div className="w-14 h-14 bg-gradient-to-br from-accent to-primary rounded-xl flex items-center justify-center text-primary-foreground mb-4 group-hover:scale-110 transition-transform">
                 <FileCheck className="w-7 h-7" />
               </div>
               <h3 className="font-semibold text-foreground text-lg mb-2">Prosedur Pendaftaran</h3>
               <p className="text-muted-foreground">Langkah-langkah untuk mengajukan bantuan BSPS.</p>
-            </div>
+            </button>
 
-            <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group" style={{ transitionDelay: '0.2s' }}>
+            <button 
+              onClick={() => document.getElementById('kriteria')?.scrollIntoView({ behavior: 'smooth' })}
+              className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group text-left"
+              style={{ transitionDelay: '0.2s' }}
+            >
               <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground mb-4 group-hover:scale-110 transition-transform">
                 <Users className="w-7 h-7" />
               </div>
               <h3 className="font-semibold text-foreground text-lg mb-2">Kriteria Penerima</h3>
               <p className="text-muted-foreground">Kriteria masyarakat yang berhak menerima BSPS.</p>
-            </div>
+            </button>
           </div>
 
           {/* Requirements */}
-          <div className="mb-16">
+          <div id="persyaratan" className="mb-16 scroll-mt-24">
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Persyaratan Penerima</h2>
             <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {requirements.map((req, index) => (
@@ -370,11 +381,22 @@ const PenerimaanBSPS = () => {
           </div>
 
           {/* Steps */}
-          <div className="mb-16">
+          <div id="prosedur" className="mb-16 scroll-mt-24">
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Prosedur Pendaftaran</h2>
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {steps.map((step, index) => (
+              {steps.slice(0, 3).map((step, index) => (
                 <div key={step.step} className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors" style={{ transitionDelay: `${index * 0.1}s` }}>
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4">
+                    {step.step}
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </div>
+              ))}
+            </div>
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-6">
+              {steps.slice(3).map((step, index) => (
+                <div key={step.step} className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors" style={{ transitionDelay: `${(index + 3) * 0.1}s` }}>
                   <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4">
                     {step.step}
                   </div>
@@ -385,19 +407,52 @@ const PenerimaanBSPS = () => {
             </div>
           </div>
 
-          {/* FAQ */}
-          <div className="mb-16">
-            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Pertanyaan Umum</h2>
-            <div className="max-w-3xl mx-auto space-y-4">
-              {faqs.map((faq, index) => (
-                <div key={index} className="p-6 bg-card rounded-2xl border border-border animate-on-scroll hover:border-primary/30 transition-colors" style={{ transitionDelay: `${index * 0.1}s` }}>
-                  <div className="flex items-start gap-3 mb-3">
-                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <h3 className="font-semibold text-foreground">{faq.question}</h3>
-                  </div>
-                  <p className="text-muted-foreground pl-8">{faq.answer}</p>
+          {/* Kriteria Penerima */}
+          <div id="kriteria" className="mb-16 scroll-mt-24">
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Kriteria Penerima</h2>
+            <div className="max-w-4xl mx-auto bg-card rounded-2xl border border-border p-8 shadow-lg">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    Kriteria Utama
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2 text-muted-foreground">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>Masyarakat Berpenghasilan Rendah (MBR)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-muted-foreground">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>Memiliki rumah tidak layak huni</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-muted-foreground">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>Terdaftar dalam Data Terpadu Kesejahteraan Sosial (DTKS)</span>
+                    </li>
+                  </ul>
                 </div>
-              ))}
+                <div>
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <FileCheck className="w-5 h-5 text-primary" />
+                    Prioritas Penerima
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2 text-muted-foreground">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>Lansia, janda, dan penyandang disabilitas</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-muted-foreground">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>Keluarga miskin dengan anak balita</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-muted-foreground">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
+                      <span>Korban bencana alam</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 

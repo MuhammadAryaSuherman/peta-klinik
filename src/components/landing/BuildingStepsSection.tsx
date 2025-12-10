@@ -36,7 +36,7 @@ const steps = [
     icon: Home,
     step: 'AKHIR',
     title: 'Tahap Akhir',
-    description: 'Pemeriksaan bangunan dan mengurus SLF (Sertifikat Laik Fungsi).',
+    description: 'Pemeriksaan bangunan, Mengurus SLF.',
   },
 ];
 
@@ -76,26 +76,34 @@ const BuildingStepsSection = () => {
 
         {/* Steps Timeline */}
         <div className="relative max-w-6xl mx-auto">
-          {/* Connection Line - Desktop */}
-          <div className="hidden lg:block absolute top-24 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary rounded-full" />
+          {/* Connection Line - Vertical for mobile/tablet, horizontal for desktop */}
+          <div className="hidden lg:block absolute top-[88px] left-[calc(16.67%-20px)] right-[calc(16.67%-20px)] h-1 bg-gradient-to-r from-primary via-accent to-primary rounded-full z-0" />
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Vertical connection lines between rows on desktop */}
+          <div className="hidden lg:block absolute left-[calc(16.67%)] top-[88px] w-1 h-[calc(100%-176px)] bg-gradient-to-b from-primary to-accent rounded-full z-0" style={{ left: 'calc(16.67% - 2px)' }} />
+          <div className="hidden lg:block absolute right-[calc(16.67%)] top-[88px] w-1 h-[calc(100%-176px)] bg-gradient-to-b from-primary to-accent rounded-full z-0" style={{ right: 'calc(16.67% - 2px)' }} />
+          
+          {/* Second row horizontal line */}
+          <div className="hidden lg:block absolute bottom-[112px] left-[calc(16.67%-20px)] right-[calc(16.67%-20px)] h-1 bg-gradient-to-r from-accent via-primary to-accent rounded-full z-0" />
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
             {steps.map((item, index) => {
               const IconComponent = item.icon;
+              const isLast = item.step === 'AKHIR';
               return (
                 <div
                   key={index}
                   className="relative animate-on-scroll"
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
-                  <div className="bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group h-full min-h-[200px] flex flex-col">
+                  <div className={`bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group h-[200px] flex flex-col ${isLast ? 'ring-2 ring-accent-2/50' : ''}`}>
                     {/* Step Number with Icon */}
                     <div className="flex items-center gap-4 mb-4">
                       <div className="relative flex-shrink-0">
-                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform">
+                        <div className={`w-16 h-16 ${isLast ? 'bg-gradient-to-br from-accent-2 to-primary' : 'bg-gradient-to-br from-primary to-accent'} rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform`}>
                           <IconComponent className="w-7 h-7" />
                         </div>
-                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-accent-2 rounded-full flex items-center justify-center text-accent-2-foreground font-bold text-xs shadow">
+                        <div className={`absolute -top-2 -right-2 ${isLast ? 'w-auto px-2' : 'w-8'} h-8 ${isLast ? 'bg-green-500' : 'bg-accent-2'} rounded-full flex items-center justify-center text-white font-bold text-xs shadow`}>
                           {item.step}
                         </div>
                       </div>
