@@ -1,327 +1,206 @@
-import { useEffect, useRef, useState, useMemo } from 'react';
-import L from 'leaflet';
-import { ArrowLeft, Gift, MapPin, Search, Layers, X, Users, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
+import { Gift, FileCheck, Users, ClipboardList, CheckCircle, ArrowRight, AlertCircle, HelpCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import useScrollAnimation from '@/hooks/useScrollAnimation';
 
-interface DesaData {
-  id: string;
-  namaDesa: string;
-  kabupatenKota: string;
-  kecamatan: string;
-  kelurahan: string;
-  lat: number;
-  lng: number;
-  jumlahPenerima: number;
-  tahun: number;
-  status: 'selesai' | 'proses' | 'rencana';
-}
-
-const desaData: DesaData[] = [
-  { id: '1', namaDesa: 'Desa Tanjung Rejo', kabupatenKota: 'Deli Serdang', kecamatan: 'Percut Sei Tuan', kelurahan: 'Tanjung Rejo', lat: 3.6234, lng: 98.7567, jumlahPenerima: 45, tahun: 2024, status: 'selesai' },
-  { id: '2', namaDesa: 'Desa Medan Estate', kabupatenKota: 'Deli Serdang', kecamatan: 'Percut Sei Tuan', kelurahan: 'Medan Estate', lat: 3.6156, lng: 98.7234, jumlahPenerima: 32, tahun: 2024, status: 'proses' },
-  { id: '3', namaDesa: 'Desa Sunggal', kabupatenKota: 'Deli Serdang', kecamatan: 'Sunggal', kelurahan: 'Sunggal', lat: 3.5789, lng: 98.5678, jumlahPenerima: 28, tahun: 2024, status: 'selesai' },
-  { id: '4', namaDesa: 'Desa Helvetia', kabupatenKota: 'Deli Serdang', kecamatan: 'Labuhan Deli', kelurahan: 'Helvetia', lat: 3.6012, lng: 98.6234, jumlahPenerima: 55, tahun: 2024, status: 'proses' },
-  { id: '5', namaDesa: 'Desa Amplas', kabupatenKota: 'Medan', kecamatan: 'Medan Amplas', kelurahan: 'Amplas', lat: 3.5452, lng: 98.7123, jumlahPenerima: 40, tahun: 2024, status: 'rencana' },
+const requirements = [
+  'Warga Negara Indonesia (WNI)',
+  'Sudah berkeluarga atau berusia minimal 21 tahun',
+  'Memiliki atau menguasai tanah dengan bukti kepemilikan',
+  'Belum pernah menerima bantuan perumahan dari pemerintah',
+  'Berpenghasilan rendah (sesuai ketentuan yang berlaku)',
+  'Rumah tidak layak huni atau belum memiliki rumah',
 ];
 
-const statusColors: Record<string, string> = {
-  'selesai': '#10b981',
-  'proses': '#f59e0b',
-  'rencana': '#6366f1',
-};
+const steps = [
+  { step: 1, title: 'Pendaftaran', description: 'Mengisi formulir pendaftaran di kantor desa atau kelurahan' },
+  { step: 2, title: 'Verifikasi', description: 'Tim melakukan verifikasi data dan survei lapangan' },
+  { step: 3, title: 'Seleksi', description: 'Penetapan calon penerima berdasarkan kriteria' },
+  { step: 4, title: 'Pencairan', description: 'Bantuan disalurkan secara bertahap sesuai progres' },
+  { step: 5, title: 'Pembangunan', description: 'Pelaksanaan pembangunan dengan pendampingan' },
+  { step: 6, title: 'Serah Terima', description: 'Verifikasi akhir dan serah terima rumah' },
+];
 
-const statusLabels: Record<string, string> = {
-  'selesai': 'Selesai',
-  'proses': 'Dalam Proses',
-  'rencana': 'Rencana',
-};
+const faqs = [
+  {
+    question: 'Berapa nilai bantuan BSPS yang diberikan?',
+    answer: 'Nilai bantuan BSPS bervariasi tergantung jenis bantuan, mulai dari Rp 17,5 juta untuk Peningkatan Kualitas hingga Rp 40 juta untuk Pembangunan Baru.',
+  },
+  {
+    question: 'Apakah bantuan BSPS harus dikembalikan?',
+    answer: 'Tidak, bantuan BSPS bersifat stimulan (hibah) dan tidak perlu dikembalikan kepada pemerintah.',
+  },
+  {
+    question: 'Bagaimana cara mengecek status pendaftaran?',
+    answer: 'Status pendaftaran dapat dicek melalui kantor desa/kelurahan atau menghubungi kantor BP3KP setempat.',
+  },
+];
 
 const PenerimaanBSPS = () => {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [mapReady, setMapReady] = useState(false);
-  const [selectedDesa, setSelectedDesa] = useState<DesaData | null>(null);
-  
-  // Filters
-  const [filterKabKota, setFilterKabKota] = useState('');
-  const [filterKecamatan, setFilterKecamatan] = useState('');
-  const [filterKelurahan, setFilterKelurahan] = useState('');
-
-  // Get unique filter options
-  const kabKotaOptions = useMemo(() => [...new Set(desaData.map(d => d.kabupatenKota))], []);
-  const kecamatanOptions = useMemo(() => {
-    const filtered = filterKabKota ? desaData.filter(d => d.kabupatenKota === filterKabKota) : desaData;
-    return [...new Set(filtered.map(d => d.kecamatan))];
-  }, [filterKabKota]);
-  const kelurahanOptions = useMemo(() => {
-    let filtered = desaData;
-    if (filterKabKota) filtered = filtered.filter(d => d.kabupatenKota === filterKabKota);
-    if (filterKecamatan) filtered = filtered.filter(d => d.kecamatan === filterKecamatan);
-    return [...new Set(filtered.map(d => d.kelurahan))];
-  }, [filterKabKota, filterKecamatan]);
-
-  const filteredData = useMemo(() => {
-    return desaData.filter((desa) => {
-      const matchesSearch = !searchQuery || 
-        desa.namaDesa.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        desa.kecamatan.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesKabKota = !filterKabKota || desa.kabupatenKota === filterKabKota;
-      const matchesKecamatan = !filterKecamatan || desa.kecamatan === filterKecamatan;
-      const matchesKelurahan = !filterKelurahan || desa.kelurahan === filterKelurahan;
-      return matchesSearch && matchesKabKota && matchesKecamatan && matchesKelurahan;
-    });
-  }, [searchQuery, filterKabKota, filterKecamatan, filterKelurahan]);
-
-  // Initialize map
-  useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return;
-
-    const map = L.map(mapRef.current, {
-      center: [3.5952, 98.6722],
-      zoom: 10,
-      zoomControl: true,
-    });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap',
-      maxZoom: 19,
-    }).addTo(map);
-
-    mapInstanceRef.current = map;
-    setMapReady(true);
-
-    return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
-  }, []);
-
-  // Add markers
-  useEffect(() => {
-    if (!mapInstanceRef.current || !mapReady) return;
-
-    const map = mapInstanceRef.current;
-
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        map.removeLayer(layer);
-      }
-    });
-
-    filteredData.forEach((desa) => {
-      const customIcon = L.divIcon({
-        html: `
-          <div style="
-            width: 36px;
-            height: 36px;
-            background: ${statusColors[desa.status]};
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            border: 3px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          ">
-            <svg style="transform: rotate(45deg); width: 16px; height: 16px;" viewBox="0 0 24 24" fill="white">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            </svg>
-          </div>
-        `,
-        className: 'custom-marker',
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-        popupAnchor: [0, -36],
-      });
-
-      const marker = L.marker([desa.lat, desa.lng], { icon: customIcon }).addTo(map);
-
-      const popupContent = `
-        <div style="min-width: 260px; font-family: system-ui, sans-serif; padding: 4px;">
-          <h3 style="font-weight: bold; font-size: 15px; margin-bottom: 8px; color: #0E5B73;">${desa.namaDesa}</h3>
-          <span style="display: inline-block; padding: 3px 10px; font-size: 11px; font-weight: 500; border-radius: 6px; color: white; background: ${statusColors[desa.status]}; margin-bottom: 10px;">${statusLabels[desa.status]}</span>
-          
-          <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
-            <tr><td style="padding: 4px 0; color: #666;">Kabupaten/Kota</td><td style="padding: 4px 0; font-weight: 500;">${desa.kabupatenKota}</td></tr>
-            <tr><td style="padding: 4px 0; color: #666;">Kecamatan</td><td style="padding: 4px 0; font-weight: 500;">${desa.kecamatan}</td></tr>
-            <tr><td style="padding: 4px 0; color: #666;">Kelurahan</td><td style="padding: 4px 0; font-weight: 500;">${desa.kelurahan}</td></tr>
-            <tr><td style="padding: 4px 0; color: #666;">Jumlah Penerima</td><td style="padding: 4px 0; font-weight: 500;">${desa.jumlahPenerima} KK</td></tr>
-            <tr><td style="padding: 4px 0; color: #666;">Tahun</td><td style="padding: 4px 0; font-weight: 500;">${desa.tahun}</td></tr>
-          </table>
-        </div>
-      `;
-
-      marker.bindPopup(popupContent, { maxWidth: 300 });
-
-      marker.on('click', () => {
-        setSelectedDesa(desa);
-      });
-    });
-
-  }, [filteredData, mapReady]);
+  const ref = useScrollAnimation();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      
-      <div className="flex-1 flex flex-col pt-16 lg:pt-20">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-accent py-8 px-4">
-          <div className="container mx-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <Link to="/" className="p-2 hover:bg-white/10 rounded-lg transition-colors text-primary-foreground">
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 text-primary-foreground rounded-full text-sm font-medium">
-                <Gift className="w-4 h-4" />
-                <span>BSPS</span>
-              </div>
+      <main ref={ref} className="pt-24 pb-16">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <div className="text-center mb-16 animate-on-scroll">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4 border border-primary/20">
+              <Gift className="w-4 h-4" />
+              <span>BSPS</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-primary-foreground mb-2">Penerimaan BSPS</h1>
-            <p className="text-primary-foreground/80">Peta sebaran penerima Bantuan Stimulan Perumahan Swadaya</p>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              Penerimaan BSPS
+            </h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Bantuan Stimulan Perumahan Swadaya (BSPS) untuk masyarakat berpenghasilan rendah dalam memperbaiki atau membangun rumah.
+            </p>
           </div>
-        </div>
 
-        {/* Stats */}
-        <div className="bg-card border-b border-border px-4 py-4">
-          <div className="container mx-auto flex flex-wrap items-center gap-4">
-            <div className="stat-badge">
-              <Home className="w-4 h-4" />
-              <span>{filteredData.length} Desa</span>
-            </div>
-            <div className="stat-badge">
-              <Users className="w-4 h-4" />
-              <span>{filteredData.reduce((acc, d) => acc + d.jumlahPenerima, 0)} Penerima</span>
-            </div>
-            <div className="flex-1" />
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden p-2 hover:bg-secondary rounded-lg">
-              <Layers className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 flex relative overflow-hidden">
-          {/* Sidebar */}
-          <div className={`
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-            absolute lg:relative z-20 h-full w-80 lg:w-96 bg-card border-r border-border 
-            transition-transform duration-300 flex flex-col
-          `}>
-            {/* Filters */}
-            <div className="p-4 border-b border-border space-y-3 flex-shrink-0">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Cari desa..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-secondary border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
+          {/* Info Cards */}
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
+            <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group">
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground mb-4 group-hover:scale-110 transition-transform">
+                <ClipboardList className="w-7 h-7" />
               </div>
-              
-              <select
-                value={filterKabKota}
-                onChange={(e) => { setFilterKabKota(e.target.value); setFilterKecamatan(''); setFilterKelurahan(''); }}
-                className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-sm"
-              >
-                <option value="">Semua Kabupaten/Kota</option>
-                {kabKotaOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-              
-              <select
-                value={filterKecamatan}
-                onChange={(e) => { setFilterKecamatan(e.target.value); setFilterKelurahan(''); }}
-                className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-sm"
-              >
-                <option value="">Semua Kecamatan</option>
-                {kecamatanOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-              
-              <select
-                value={filterKelurahan}
-                onChange={(e) => setFilterKelurahan(e.target.value)}
-                className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-sm"
-              >
-                <option value="">Semua Kelurahan</option>
-                {kelurahanOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
+              <h3 className="font-semibold text-foreground text-lg mb-2">Persyaratan</h3>
+              <p className="text-muted-foreground">
+                Informasi lengkap persyaratan untuk mendaftar program BSPS.
+              </p>
             </div>
 
-            {/* List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {filteredData.map((desa) => (
+            <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group" style={{ transitionDelay: '0.1s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-accent to-primary rounded-xl flex items-center justify-center text-primary-foreground mb-4 group-hover:scale-110 transition-transform">
+                <FileCheck className="w-7 h-7" />
+              </div>
+              <h3 className="font-semibold text-foreground text-lg mb-2">Prosedur Pendaftaran</h3>
+              <p className="text-muted-foreground">
+                Langkah-langkah untuk mengajukan bantuan BSPS.
+              </p>
+            </div>
+
+            <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group" style={{ transitionDelay: '0.2s' }}>
+              <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground mb-4 group-hover:scale-110 transition-transform">
+                <Users className="w-7 h-7" />
+              </div>
+              <h3 className="font-semibold text-foreground text-lg mb-2">Kriteria Penerima</h3>
+              <p className="text-muted-foreground">
+                Kriteria masyarakat yang berhak menerima BSPS.
+              </p>
+            </div>
+          </div>
+
+          {/* Requirements */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Persyaratan Penerima</h2>
+            <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+              {requirements.map((req, index) => (
                 <div
-                  key={desa.id}
-                  onClick={() => {
-                    setSelectedDesa(desa);
-                    setSidebarOpen(false);
-                    if (mapInstanceRef.current) {
-                      mapInstanceRef.current.setView([desa.lat, desa.lng], 14);
-                    }
-                  }}
-                  className={`clinic-card ${selectedDesa?.id === desa.id ? 'clinic-card-active' : ''}`}
+                  key={index}
+                  className="flex items-start gap-3 p-4 bg-card rounded-xl border border-border animate-on-scroll"
+                  style={{ transitionDelay: `${index * 0.05}s` }}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground text-sm">{desa.namaDesa}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        <MapPin className="w-3 h-3 inline mr-1" />
-                        {desa.kecamatan}, {desa.kabupatenKota}
-                      </p>
-                    </div>
-                    <span
-                      className="px-2 py-0.5 text-[10px] font-medium rounded text-white flex-shrink-0"
-                      style={{ backgroundColor: statusColors[desa.status] }}
-                    >
-                      {statusLabels[desa.status]}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                    <span>{desa.jumlahPenerima} Penerima</span>
-                    <span>Tahun {desa.tahun}</span>
-                  </div>
+                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <span className="text-foreground">{req}</span>
                 </div>
               ))}
             </div>
-
-            <button onClick={() => setSidebarOpen(false)} className="lg:hidden absolute top-4 right-4 p-2 hover:bg-secondary rounded-lg">
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
-          {/* Map */}
-          <div className="flex-1 relative z-10">
-            <div ref={mapRef} className="w-full h-full" />
-
-            {/* Legend */}
-            <div className="absolute bottom-4 right-4 bg-card/95 backdrop-blur-sm border border-border rounded-xl p-3 shadow-lg z-[1000]">
-              <h4 className="text-xs font-semibold text-foreground mb-2">Legenda</h4>
-              <div className="space-y-1.5">
-                {Object.entries(statusLabels).map(([key, label]) => (
-                  <div key={key} className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: statusColors[key] }} />
-                    <span className="text-xs text-muted-foreground">{label}</span>
+          {/* Steps */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Prosedur Pendaftaran</h2>
+            <div className="relative max-w-4xl mx-auto">
+              {/* Connection Line */}
+              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-accent -translate-y-1/2" />
+              
+              <div className="grid md:grid-cols-3 gap-6">
+                {steps.slice(0, 3).map((step, index) => (
+                  <div
+                    key={step.step}
+                    className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors"
+                    style={{ transitionDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4 relative z-10">
+                      {step.step}
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-6 mt-6">
+                {steps.slice(3).map((step, index) => (
+                  <div
+                    key={step.step}
+                    className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors"
+                    style={{ transitionDelay: `${(index + 3) * 0.1}s` }}
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4 relative z-10">
+                      {step.step}
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
 
-            {!sidebarOpen && (
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden absolute top-4 left-4 bg-card border border-border rounded-lg p-3 shadow-lg z-[1000]">
-                <Layers className="w-5 h-5" />
-              </button>
-            )}
+          {/* FAQ */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Pertanyaan Umum</h2>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className="p-6 bg-card rounded-2xl border border-border animate-on-scroll hover:border-primary/30 transition-colors"
+                  style={{ transitionDelay: `${index * 0.1}s` }}
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    <HelpCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <h3 className="font-semibold text-foreground">{faq.question}</h3>
+                  </div>
+                  <p className="text-muted-foreground pl-8">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link
+              to="/peta/penerima-bsps/medan"
+              className="p-8 bg-gradient-to-r from-primary to-accent rounded-2xl text-primary-foreground animate-on-scroll group hover:shadow-xl transition-shadow"
+            >
+              <Gift className="w-12 h-12 mb-4 opacity-80" />
+              <h3 className="text-xl font-bold mb-2">Lihat Penerima BSPS</h3>
+              <p className="opacity-80 mb-4">Lihat sebaran penerima BSPS di peta interaktif</p>
+              <div className="flex items-center gap-2 font-medium">
+                <span>Buka Peta</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+
+            <div className="p-8 bg-card rounded-2xl border border-border animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
+              <AlertCircle className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-bold text-foreground mb-2">Butuh Bantuan?</h3>
+              <p className="text-muted-foreground mb-4">Hubungi kami untuk informasi lebih lanjut tentang program BSPS</p>
+              <Link
+                to="/informasi/kontak"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary-hover transition-colors"
+              >
+                Hubungi Kami
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Menu, X, Building2, MapPin, Home, Info, Palette, LogIn, BookOpen, Gift, Wrench, FileText, Users, Scale } from 'lucide-react';
+import { ChevronDown, Menu, X, Building2, MapPin, Home, Info, Palette, LogIn, BookOpen, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -36,6 +36,13 @@ const menuItems: MenuItem[] = [
           { label: 'Sumatera Utara', href: '/peta/kawasan-kumuh/sumatera-utara' },
         ],
       },
+      {
+        label: 'Penerima Bantuan BSPS',
+        subItems: [
+          { label: 'Medan', href: '/peta/penerima-bsps/medan' },
+          { label: 'Sumatera Utara', href: '/peta/penerima-bsps/sumatera-utara' },
+        ],
+      },
     ],
   },
   {
@@ -57,11 +64,7 @@ const menuItems: MenuItem[] = [
     label: 'Informasi',
     icon: <Info className="w-4 h-4" />,
     subItems: [
-      { label: 'Bahan Bangunan', href: '/informasi/bahan-bangunan' },
-      { label: 'Kegiatan KRS', href: '/informasi/kegiatan-krs' },
-      { label: 'Perizinan', href: '/informasi/perizinan' },
       { label: 'Tentang Kami', href: '/informasi/tentang' },
-      { label: 'Peraturan', href: '/informasi/peraturan' },
       { label: 'Kontak', href: '/informasi/kontak' },
       { label: 'FAQ', href: '/informasi/faq' },
     ],
