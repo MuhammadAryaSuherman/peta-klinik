@@ -1,6 +1,6 @@
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import { Palette, Download, Eye, Search, BedDouble, Bath, Maximize2, Car } from 'lucide-react';
+import { Palette, Download, Eye, Search, BedDouble, Bath, Maximize2, Car, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
@@ -26,6 +26,7 @@ const designs = [
     area: 36,
     carport: false,
     previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+    pdfUrl: '/sample.pdf',
   },
   { 
     id: 2, 
@@ -37,6 +38,7 @@ const designs = [
     area: 45,
     carport: true,
     previewImages: ['/placeholder.svg', '/placeholder.svg'],
+    pdfUrl: '/sample.pdf',
   },
   { 
     id: 3, 
@@ -48,6 +50,7 @@ const designs = [
     area: 54,
     carport: true,
     previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+    pdfUrl: '/sample.pdf',
   },
   { 
     id: 4, 
@@ -59,6 +62,7 @@ const designs = [
     area: 36,
     carport: false,
     previewImages: ['/placeholder.svg'],
+    pdfUrl: '/sample.pdf',
   },
   { 
     id: 5, 
@@ -70,6 +74,7 @@ const designs = [
     area: 36,
     carport: false,
     previewImages: ['/placeholder.svg', '/placeholder.svg'],
+    pdfUrl: '/sample.pdf',
   },
   { 
     id: 6, 
@@ -81,6 +86,7 @@ const designs = [
     area: 45,
     carport: true,
     previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+    pdfUrl: '/sample.pdf',
   },
 ];
 
@@ -88,6 +94,7 @@ const BankDesain = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [previewDesign, setPreviewDesign] = useState<typeof designs[0] | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const ref = useScrollAnimation();
 
   const filteredDesigns = designs.filter((design) => {
@@ -96,15 +103,40 @@ const BankDesain = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const handlePreview = (design: typeof designs[0]) => {
+    setPreviewDesign(design);
+    setCurrentImageIndex(0);
+  };
+
+  const handleDownloadPdf = (pdfUrl: string) => {
+    window.open(pdfUrl, '_blank');
+  };
+
+  const nextImage = () => {
+    if (previewDesign) {
+      setCurrentImageIndex((prev) => 
+        prev < previewDesign.previewImages.length - 1 ? prev + 1 : 0
+      );
+    }
+  };
+
+  const prevImage = () => {
+    if (previewDesign) {
+      setCurrentImageIndex((prev) => 
+        prev > 0 ? prev - 1 : previewDesign.previewImages.length - 1
+      );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main ref={ref} className="pt-24 pb-16">
         {/* Background Pattern */}
         <div className="fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/60 via-background to-accent-2/20 dark:from-background dark:via-primary/5 dark:to-accent/5" />
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-2/10 rounded-full blur-3xl" />
         </div>
 
         <div className="container mx-auto px-4">
@@ -134,10 +166,10 @@ const BankDesain = () => {
               />
             </div>
             <Select value={activeCategory} onValueChange={setActiveCategory}>
-              <SelectTrigger className="w-full sm:w-48">
+              <SelectTrigger className="w-full sm:w-48 bg-card">
                 <SelectValue placeholder="Pilih Tipe" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover">
                 {categories.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
                 ))}
@@ -153,6 +185,7 @@ const BankDesain = () => {
                 className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/30 transition-all shadow-md hover:shadow-xl animate-on-scroll group"
                 style={{ transitionDelay: `${index * 0.05}s` }}
               >
+                {/* Thumbnail */}
                 <div className="aspect-video bg-secondary relative overflow-hidden">
                   <img src={design.image} alt={design.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
@@ -184,13 +217,16 @@ const BankDesain = () => {
                   {/* Buttons */}
                   <div className="flex gap-3">
                     <button 
-                      onClick={() => setPreviewDesign(design)}
+                      onClick={() => handlePreview(design)}
                       className="flex-1 px-4 py-2.5 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-secondary/80 transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                       Preview
                     </button>
-                    <button className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-primary-hover transition-colors">
+                    <button 
+                      onClick={() => handleDownloadPdf(design.pdfUrl)}
+                      className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-primary-hover transition-colors"
+                    >
                       <Download className="w-4 h-4" />
                       Unduh PDF
                     </button>
@@ -213,25 +249,61 @@ const BankDesain = () => {
       </main>
       <Footer />
 
-      {/* Preview Dialog */}
+      {/* Preview Dialog with Carousel */}
       <Dialog open={!!previewDesign} onOpenChange={() => setPreviewDesign(null)}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl bg-card">
           <DialogHeader>
-            <DialogTitle>{previewDesign?.title}</DialogTitle>
+            <DialogTitle className="text-foreground">{previewDesign?.title}</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4">
-            {previewDesign?.previewImages.map((img, i) => (
-              <img 
-                key={i} 
-                src={img} 
-                alt={`Preview ${i + 1}`} 
-                className="w-full rounded-lg border border-border"
-              />
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground text-center">
-            Gambar preview tidak dapat diunduh. Gunakan tombol "Unduh PDF" untuk mendapatkan dokumen lengkap.
-          </p>
+          {previewDesign && (
+            <div className="relative">
+              {/* Main Image */}
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-secondary">
+                <img 
+                  src={previewDesign.previewImages[currentImageIndex]} 
+                  alt={`Preview ${currentImageIndex + 1}`} 
+                  className="w-full h-full object-contain"
+                />
+                
+                {/* Navigation Arrows */}
+                {previewDesign.previewImages.length > 1 && (
+                  <>
+                    <button 
+                      onClick={prevImage}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button 
+                      onClick={nextImage}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/80 rounded-full flex items-center justify-center text-foreground hover:bg-background transition-colors"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+              </div>
+              
+              {/* Dots Indicator */}
+              {previewDesign.previewImages.length > 1 && (
+                <div className="flex justify-center gap-2 mt-4">
+                  {previewDesign.previewImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentImageIndex(i)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        i === currentImageIndex ? 'bg-primary' : 'bg-muted'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              <p className="text-sm text-muted-foreground text-center mt-4">
+                Gambar preview tidak dapat diunduh. Gunakan tombol "Unduh PDF" untuk mendapatkan dokumen lengkap.
+              </p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

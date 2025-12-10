@@ -75,24 +75,24 @@ const HousingIndicatorsSection = () => {
   const ref = useScrollAnimation();
 
   return (
-    <section ref={ref} className="py-20 lg:py-32 relative overflow-hidden">
+    <section ref={ref} className="py-16 lg:py-24 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-        <div className="absolute top-0 left-0 w-full h-full opacity-20 dark:opacity-5"
+        <div className="absolute inset-0 bg-gradient-to-b from-secondary/60 via-background to-secondary/40 dark:from-background dark:via-primary/5 dark:to-background" />
+        <div className="absolute top-0 left-0 w-full h-full opacity-30 dark:opacity-5"
           style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.1) 0%, transparent 50%)`,
+            backgroundImage: `radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.15) 0%, transparent 50%), radial-gradient(circle at 75% 75%, hsl(var(--accent-2) / 0.2) 0%, transparent 50%)`,
           }}
         />
       </div>
       
       {/* Decorative Elements */}
       <div className="absolute top-1/4 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-accent-2/10 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 animate-on-scroll">
+        <div className="text-center max-w-2xl mx-auto mb-12 animate-on-scroll">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4 border border-primary/20">
             Indikator Kelayakan
           </span>
@@ -121,16 +121,16 @@ const HousingIndicatorsSection = () => {
                     alt={indicator.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
                   
-                  {/* Icon Badge - Overlapping */}
-                  <div className="absolute -bottom-7 left-6 w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform z-10">
+                  {/* Icon Badge - Fully Visible */}
+                  <div className="absolute bottom-4 left-6 w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform z-10">
                     <IconComponent className="w-7 h-7" />
                   </div>
                 </div>
                 
                 {/* Content */}
-                <div className="p-6 pt-10">
+                <div className="p-6 pt-4">
                   <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-4">
                     {indicator.title}
                   </h3>

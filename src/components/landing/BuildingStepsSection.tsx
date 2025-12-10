@@ -34,9 +34,9 @@ const steps = [
   },
   {
     icon: Home,
-    step: 6,
-    title: 'Serah Terima',
-    description: 'Periksa hasil pembangunan dan lakukan serah terima rumah.',
+    step: 'AKHIR',
+    title: 'Tahap Akhir',
+    description: 'Pemeriksaan bangunan dan mengurus SLF (Sertifikat Laik Fungsi).',
   },
 ];
 
@@ -44,13 +44,13 @@ const BuildingStepsSection = () => {
   const ref = useScrollAnimation();
 
   return (
-    <section ref={ref} className="py-20 lg:py-32 relative overflow-hidden">
+    <section ref={ref} className="py-16 lg:py-24 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary/50 via-background to-primary/5" />
+        <div className="absolute inset-0 bg-gradient-to-br from-accent-2/20 via-background to-secondary/40 dark:from-primary/5 dark:via-background dark:to-accent/5" />
         <div className="absolute inset-0 opacity-20 dark:opacity-10"
           style={{
-            backgroundImage: `linear-gradient(30deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(150deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(30deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(150deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(60deg, hsl(var(--accent) / 0.08) 25%, transparent 25.5%, transparent 75%, hsl(var(--accent) / 0.08) 75%, hsl(var(--accent) / 0.08)), linear-gradient(60deg, hsl(var(--accent) / 0.08) 25%, transparent 25.5%, transparent 75%, hsl(var(--accent) / 0.08) 75%, hsl(var(--accent) / 0.08))`,
+            backgroundImage: `linear-gradient(30deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(150deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(30deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(150deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(60deg, hsl(var(--accent-2) / 0.08) 25%, transparent 25.5%, transparent 75%, hsl(var(--accent-2) / 0.08) 75%, hsl(var(--accent-2) / 0.08)), linear-gradient(60deg, hsl(var(--accent-2) / 0.08) 25%, transparent 25.5%, transparent 75%, hsl(var(--accent-2) / 0.08) 75%, hsl(var(--accent-2) / 0.08))`,
             backgroundSize: '80px 140px',
             backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
           }}
@@ -62,7 +62,7 @@ const BuildingStepsSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 animate-on-scroll">
+        <div className="text-center max-w-2xl mx-auto mb-12 animate-on-scroll">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4 border border-primary/20">
             Panduan Pembangunan
           </span>
@@ -88,14 +88,14 @@ const BuildingStepsSection = () => {
                   className="relative animate-on-scroll"
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
-                  <div className="bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group h-full flex flex-col">
+                  <div className="bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group h-full min-h-[200px] flex flex-col">
                     {/* Step Number with Icon */}
                     <div className="flex items-center gap-4 mb-4">
                       <div className="relative flex-shrink-0">
                         <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform">
                           <IconComponent className="w-7 h-7" />
                         </div>
-                        <div className="absolute -top-2 -right-2 w-7 h-7 bg-accent-2 rounded-full flex items-center justify-center text-accent-2-foreground font-bold text-sm shadow">
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-accent-2 rounded-full flex items-center justify-center text-accent-2-foreground font-bold text-xs shadow">
                           {item.step}
                         </div>
                       </div>
