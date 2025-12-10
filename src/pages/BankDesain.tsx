@@ -1,30 +1,93 @@
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import { Palette, Home, Building2, Download, Eye, Filter, Search, ArrowRight } from 'lucide-react';
+import { Palette, Download, Eye, Search, BedDouble, Bath, Maximize2, Car } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const categories = [
-  { id: 'all', label: 'Semua' },
-  { id: 'rumah-36', label: 'Rumah Tipe 36' },
-  { id: 'rumah-45', label: 'Rumah Tipe 45' },
-  { id: 'rumah-54', label: 'Rumah Tipe 54' },
+  { id: 'all', label: 'Semua Tipe' },
+  { id: 'rumah-36', label: 'Tipe 36' },
+  { id: 'rumah-45', label: 'Tipe 45' },
+  { id: 'rumah-54', label: 'Tipe 54' },
   { id: 'rusun', label: 'Rusun' },
 ];
 
 const designs = [
-  { id: 1, title: 'Rumah Tipe 36 Minimalis', category: 'rumah-36', image: '/placeholder.svg', downloads: 234 },
-  { id: 2, title: 'Rumah Tipe 45 Modern', category: 'rumah-45', image: '/placeholder.svg', downloads: 189 },
-  { id: 3, title: 'Rumah Tipe 54 Tropis', category: 'rumah-54', image: '/placeholder.svg', downloads: 156 },
-  { id: 4, title: 'Rusun Blok A', category: 'rusun', image: '/placeholder.svg', downloads: 312 },
-  { id: 5, title: 'Rumah Tipe 36 Compact', category: 'rumah-36', image: '/placeholder.svg', downloads: 278 },
-  { id: 6, title: 'Rumah Tipe 45 Klasik', category: 'rumah-45', image: '/placeholder.svg', downloads: 145 },
+  { 
+    id: 1, 
+    title: 'Rumah Tipe 36 Minimalis', 
+    category: 'rumah-36', 
+    image: '/placeholder.svg',
+    bedrooms: 2,
+    bathrooms: 1,
+    area: 36,
+    carport: false,
+    previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+  },
+  { 
+    id: 2, 
+    title: 'Rumah Tipe 45 Modern', 
+    category: 'rumah-45', 
+    image: '/placeholder.svg',
+    bedrooms: 2,
+    bathrooms: 1,
+    area: 45,
+    carport: true,
+    previewImages: ['/placeholder.svg', '/placeholder.svg'],
+  },
+  { 
+    id: 3, 
+    title: 'Rumah Tipe 54 Tropis', 
+    category: 'rumah-54', 
+    image: '/placeholder.svg',
+    bedrooms: 3,
+    bathrooms: 2,
+    area: 54,
+    carport: true,
+    previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+  },
+  { 
+    id: 4, 
+    title: 'Rusun Blok A', 
+    category: 'rusun', 
+    image: '/placeholder.svg',
+    bedrooms: 2,
+    bathrooms: 1,
+    area: 36,
+    carport: false,
+    previewImages: ['/placeholder.svg'],
+  },
+  { 
+    id: 5, 
+    title: 'Rumah Tipe 36 Compact', 
+    category: 'rumah-36', 
+    image: '/placeholder.svg',
+    bedrooms: 2,
+    bathrooms: 1,
+    area: 36,
+    carport: false,
+    previewImages: ['/placeholder.svg', '/placeholder.svg'],
+  },
+  { 
+    id: 6, 
+    title: 'Rumah Tipe 45 Klasik', 
+    category: 'rumah-45', 
+    image: '/placeholder.svg',
+    bedrooms: 3,
+    bathrooms: 1,
+    area: 45,
+    carport: true,
+    previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+  },
 ];
 
 const BankDesain = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [previewDesign, setPreviewDesign] = useState<typeof designs[0] | null>(null);
   const ref = useScrollAnimation();
 
   const filteredDesigns = designs.filter((design) => {
@@ -37,9 +100,16 @@ const BankDesain = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main ref={ref} className="pt-24 pb-16">
+        {/* Background Pattern */}
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        </div>
+
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="text-center mb-12 animate-on-scroll">
+          <div className="text-center mb-10 animate-on-scroll">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4 border border-primary/20">
               <Palette className="w-4 h-4" />
               <span>Bank Desain</span>
@@ -52,9 +122,9 @@ const BankDesain = () => {
             </p>
           </div>
 
-          {/* Search & Filter */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8 animate-on-scroll">
-            <div className="relative flex-1 max-w-md">
+          {/* Search & Filter - Compact */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-8 animate-on-scroll">
+            <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <Input
                 placeholder="Cari desain..."
@@ -63,52 +133,16 @@ const BankDesain = () => {
                 className="pl-10"
               />
             </div>
-            <div className="flex gap-2 flex-wrap">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`px-4 py-2 text-sm rounded-lg border transition-all ${
-                    activeCategory === cat.id
-                      ? 'bg-primary text-primary-foreground border-primary shadow-md'
-                      : 'border-border hover:border-primary/50 bg-card'
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Categories Cards */}
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <div className="p-8 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground mb-6 group-hover:scale-110 transition-transform">
-                <Home className="w-8 h-8" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground mb-3">Desain Rumah</h2>
-              <p className="text-muted-foreground mb-6">
-                Koleksi desain rumah dengan berbagai tipe dan ukuran yang sesuai dengan kebutuhan keluarga Indonesia.
-              </p>
-              <div className="flex items-center gap-2 text-primary font-medium">
-                <span>Lihat Koleksi</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-
-            <div className="p-8 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group" style={{ transitionDelay: '0.1s' }}>
-              <div className="w-16 h-16 bg-gradient-to-br from-accent to-primary rounded-xl flex items-center justify-center text-primary-foreground mb-6 group-hover:scale-110 transition-transform">
-                <Building2 className="w-8 h-8" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground mb-3">Desain Rusun</h2>
-              <p className="text-muted-foreground mb-6">
-                Desain rumah susun yang efisien dan nyaman untuk hunian vertikal di perkotaan.
-              </p>
-              <div className="flex items-center gap-2 text-primary font-medium">
-                <span>Lihat Koleksi</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
+            <Select value={activeCategory} onValueChange={setActiveCategory}>
+              <SelectTrigger className="w-full sm:w-48">
+                <SelectValue placeholder="Pilih Tipe" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Design Grid */}
@@ -121,41 +155,85 @@ const BankDesain = () => {
               >
                 <div className="aspect-video bg-secondary relative overflow-hidden">
                   <img src={design.image} alt={design.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
-                    <div className="flex gap-2">
-                      <button className="px-4 py-2 bg-white/90 text-foreground rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-white transition-colors">
-                        <Eye className="w-4 h-4" />
-                        Preview
-                      </button>
-                      <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-primary-hover transition-colors">
-                        <Download className="w-4 h-4" />
-                        Unduh
-                      </button>
+                </div>
+                
+                {/* Content */}
+                <div className="p-5">
+                  <h3 className="font-semibold text-foreground text-lg mb-3">{design.title}</h3>
+                  
+                  {/* Facilities */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BedDouble className="w-4 h-4 text-primary" />
+                      <span>{design.bedrooms} Kamar Tidur</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Bath className="w-4 h-4 text-primary" />
+                      <span>{design.bathrooms} Kamar Mandi</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Maximize2 className="w-4 h-4 text-primary" />
+                      <span>{design.area} m²</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Car className="w-4 h-4 text-primary" />
+                      <span>{design.carport ? 'Ada Carport' : 'Tanpa Carport'}</span>
                     </div>
                   </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-foreground mb-1">{design.title}</h3>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground capitalize">{design.category.replace('-', ' ')}</span>
-                    <span className="text-primary font-medium">{design.downloads} unduhan</span>
+
+                  {/* Buttons */}
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => setPreviewDesign(design)}
+                      className="flex-1 px-4 py-2.5 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-secondary/80 transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Preview
+                    </button>
+                    <button className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-primary-hover transition-colors">
+                      <Download className="w-4 h-4" />
+                      Unduh PDF
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Empty State */}
-          <div className="text-center py-16 bg-card rounded-2xl border border-border animate-on-scroll">
-            <Palette className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">Desain Akan Ditampilkan Di Sini</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Hubungkan ke API backend untuk menampilkan koleksi lengkap desain rumah dan rusun.
-            </p>
-          </div>
+          {filteredDesigns.length === 0 && (
+            <div className="text-center py-16 bg-card rounded-2xl border border-border animate-on-scroll">
+              <Palette className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">Tidak Ada Desain Ditemukan</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Coba ubah filter atau kata kunci pencarian Anda.
+              </p>
+            </div>
+          )}
         </div>
       </main>
       <Footer />
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewDesign} onOpenChange={() => setPreviewDesign(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>{previewDesign?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4">
+            {previewDesign?.previewImages.map((img, i) => (
+              <img 
+                key={i} 
+                src={img} 
+                alt={`Preview ${i + 1}`} 
+                className="w-full rounded-lg border border-border"
+              />
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground text-center">
+            Gambar preview tidak dapat diunduh. Gunakan tombol "Unduh PDF" untuk mendapatkan dokumen lengkap.
+          </p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

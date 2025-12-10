@@ -45,8 +45,17 @@ const BuildingStepsSection = () => {
 
   return (
     <section ref={ref} className="py-20 lg:py-32 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+      {/* Background Pattern */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-secondary/50 via-background to-primary/5" />
+        <div className="absolute inset-0 opacity-20 dark:opacity-10"
+          style={{
+            backgroundImage: `linear-gradient(30deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(150deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(30deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(150deg, hsl(var(--primary) / 0.05) 12%, transparent 12.5%, transparent 87%, hsl(var(--primary) / 0.05) 87.5%, hsl(var(--primary) / 0.05)), linear-gradient(60deg, hsl(var(--accent) / 0.08) 25%, transparent 25.5%, transparent 75%, hsl(var(--accent) / 0.08) 75%, hsl(var(--accent) / 0.08)), linear-gradient(60deg, hsl(var(--accent) / 0.08) 25%, transparent 25.5%, transparent 75%, hsl(var(--accent) / 0.08) 75%, hsl(var(--accent) / 0.08))`,
+            backgroundSize: '80px 140px',
+            backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
+          }}
+        />
+      </div>
       
       {/* Decorative */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 to-transparent rounded-full" />
@@ -66,11 +75,11 @@ const BuildingStepsSection = () => {
         </div>
 
         {/* Steps Timeline */}
-        <div className="relative max-w-5xl mx-auto">
+        <div className="relative max-w-6xl mx-auto">
           {/* Connection Line - Desktop */}
           <div className="hidden lg:block absolute top-24 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary rounded-full" />
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {steps.map((item, index) => {
               const IconComponent = item.icon;
               return (
@@ -79,10 +88,10 @@ const BuildingStepsSection = () => {
                   className="relative animate-on-scroll"
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
-                  <div className="bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group">
+                  <div className="bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group h-full flex flex-col">
                     {/* Step Number with Icon */}
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="relative">
+                      <div className="relative flex-shrink-0">
                         <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform">
                           <IconComponent className="w-7 h-7" />
                         </div>
@@ -95,7 +104,7 @@ const BuildingStepsSection = () => {
                       </h3>
                     </div>
                     
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed flex-1">
                       {item.description}
                     </p>
                   </div>

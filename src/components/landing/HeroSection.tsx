@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, MapPin, Users, Gift, Phone } from 'lucide-react';
+import { ArrowRight, Building2, MapPin, Users, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import sumateraMapBg from '@/assets/sumatera-map-bg.jpg';
 
@@ -36,19 +36,12 @@ const HeroSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <Link
-                to="/peta/penerima-bsps/medan"
+                to="/lokasi-klinik"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary-hover transition-all shadow-lg hover:shadow-xl hover:shadow-primary/20 group"
               >
                 <MapPin className="w-5 h-5" />
-                Lihat Peta Sebaran
+                Lihat Lokasi Klinik
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/informasi/kontak"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-secondary text-secondary-foreground font-semibold rounded-xl hover:bg-secondary/80 transition-all border border-border backdrop-blur-sm"
-              >
-                <Phone className="w-5 h-5" />
-                Hubungi Kami
               </Link>
             </div>
           </div>
