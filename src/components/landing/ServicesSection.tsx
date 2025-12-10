@@ -1,49 +1,50 @@
-import { Building, Home, FileSearch, Gift, Palette, HelpCircle, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
 
+import serviceBankDesain from '@/assets/service-bank-desain.jpg';
+import serviceSosialisasi from '@/assets/service-sosialisasi.jpg';
+import serviceBsps from '@/assets/service-bsps.jpg';
+import serviceRusun from '@/assets/service-rusun.jpg';
+import serviceKumuh from '@/assets/service-kumuh.jpg';
+import serviceKonsultasi from '@/assets/service-konsultasi.jpg';
+
 const services = [
   {
-    icon: <Building className="w-8 h-8" />,
+    image: serviceRusun,
     title: 'Sebaran Rusun',
     description: 'Informasi lengkap lokasi rusun yang dibangun oleh BP3KP di berbagai wilayah Sumatera.',
     href: '/peta/sebaran-rusun/medan',
-    gradient: 'from-primary to-accent',
   },
   {
-    icon: <Home className="w-8 h-8" />,
+    image: serviceKumuh,
     title: 'Kawasan Kumuh',
     description: 'Profil dan data kawasan kumuh beserta program penanganannya di wilayah kerja.',
     href: '/peta/kawasan-kumuh/medan',
-    gradient: 'from-accent to-primary',
   },
   {
-    icon: <Gift className="w-8 h-8" />,
-    title: 'Penerima BSPS',
-    description: 'Data penerima Bantuan Stimulan Perumahan Swadaya di seluruh desa.',
-    href: '/peta/penerima-bsps/medan',
-    gradient: 'from-primary to-accent',
-  },
-  {
-    icon: <FileSearch className="w-8 h-8" />,
+    image: serviceBsps,
     title: 'Penerimaan BSPS',
     description: 'Informasi persyaratan dan prosedur pendaftaran program BSPS.',
     href: '/penerimaan-bsps',
-    gradient: 'from-accent to-primary',
   },
   {
-    icon: <Palette className="w-8 h-8" />,
+    image: serviceBankDesain,
     title: 'Bank Desain',
     description: 'Koleksi desain rumah dan rusun untuk referensi pembangunan hunian.',
     href: '/bank-desain',
-    gradient: 'from-primary to-accent',
   },
   {
-    icon: <HelpCircle className="w-8 h-8" />,
+    image: serviceSosialisasi,
+    title: 'Sosialisasi',
+    description: 'Kegiatan sosialisasi dan edukasi terkait perumahan dan permukiman.',
+    href: '/sosialisasi-klinik-pkp',
+  },
+  {
+    image: serviceKonsultasi,
     title: 'Konsultasi',
     description: 'Layanan konsultasi gratis seputar perumahan dan permukiman.',
     href: '/informasi/kontak',
-    gradient: 'from-accent to-primary',
   },
 ];
 
@@ -51,12 +52,15 @@ const ServicesSection = () => {
   const ref = useScrollAnimation();
 
   return (
-    <section ref={ref} className="py-20 lg:py-32 bg-secondary/30 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent rounded-full blur-3xl" />
-      </div>
+    <section ref={ref} className="py-20 lg:py-32 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-secondary/50 via-background to-secondary/30" />
+      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent" />
+      
+      {/* Decorative */}
+      <div className="absolute top-1/4 -left-32 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-accent/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
@@ -73,28 +77,40 @@ const ServicesSection = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <Link
+            <div
               key={index}
-              to={service.href}
-              className="group p-6 bg-card rounded-2xl border border-border hover:border-primary/30 shadow-md hover:shadow-xl transition-all duration-300 animate-on-scroll"
+              className="group bg-card rounded-2xl border border-border overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 animate-on-scroll"
               style={{ transitionDelay: `${index * 0.1}s` }}
             >
-              <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${service.gradient} flex items-center justify-center text-primary-foreground mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                {service.icon}
+              {/* Image */}
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={service.image}
+                  alt={service.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                {service.title}
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                {service.description}
-              </p>
-              <div className="flex items-center text-primary text-sm font-medium group-hover:gap-2 transition-all">
-                <span>Selengkapnya</span>
-                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              {/* Content */}
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                  {service.title}
+                </h3>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-5">
+                  {service.description}
+                </p>
+                <Link
+                  to={service.href}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary-hover transition-all group/btn"
+                >
+                  <span>Selengkapnya</span>
+                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                </Link>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

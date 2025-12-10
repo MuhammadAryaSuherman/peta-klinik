@@ -1,18 +1,13 @@
-import { CheckCircle, Target, Eye, Award, Users, Building2, MapPin } from 'lucide-react';
+import { CheckCircle, Target, Eye } from 'lucide-react';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
-
-const stats = [
-  { icon: <Building2 className="w-6 h-6" />, value: '150+', label: 'Unit Rusun Terbangun' },
-  { icon: <Users className="w-6 h-6" />, value: '5,000+', label: 'Penerima BSPS' },
-  { icon: <MapPin className="w-6 h-6" />, value: '10', label: 'Provinsi Terjangkau' },
-];
 
 const AboutSection = () => {
   const ref = useScrollAnimation();
 
   return (
     <section ref={ref} className="py-20 lg:py-32 relative overflow-hidden">
-      {/* Background Elements */}
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent" />
 
       <div className="container mx-auto px-4 relative z-10">
@@ -87,34 +82,7 @@ const AboutSection = () => {
                 </li>
               </ul>
             </div>
-
-            <div className="p-6 bg-gradient-to-r from-primary to-accent rounded-2xl text-primary-foreground animate-on-scroll shadow-lg" style={{ transitionDelay: '0.2s' }}>
-              <div className="flex items-center gap-4">
-                <Award className="w-10 h-10" />
-                <div>
-                  <p className="text-2xl font-bold">10+ Tahun</p>
-                  <p className="text-primary-foreground/80">Melayani Masyarakat Sumatera</p>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
-
-        {/* Stats Section */}
-        <div className="grid md:grid-cols-3 gap-6 mt-20">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors"
-              style={{ transitionDelay: `${index * 0.1}s` }}
-            >
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mx-auto mb-4">
-                {stat.icon}
-              </div>
-              <p className="text-3xl font-bold text-primary mb-1">{stat.value}</p>
-              <p className="text-muted-foreground text-sm">{stat.label}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>
