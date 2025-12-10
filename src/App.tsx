@@ -12,6 +12,10 @@ import PenerimaanBSPS from "./pages/PenerimaanBSPS";
 import Login from "./pages/Login";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import KontakPage from "./pages/informasi/KontakPage";
+import TentangPage from "./pages/informasi/TentangPage";
+import FAQPage from "./pages/informasi/FAQPage";
+import { BahanBangunanPage, KegiatanKRSPage, PerizinanPage, PeraturanPage } from "./pages/informasi/GenericInfoPages";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +35,13 @@ const App = () => (
           <Route path="/penerimaan-bsps" element={<PenerimaanBSPS />} />
           <Route path="/login" element={<Login />} />
           <Route path="/klinik" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/informasi/kontak" element={<KontakPage />} />
+          <Route path="/informasi/tentang" element={<TentangPage />} />
+          <Route path="/informasi/faq" element={<FAQPage />} />
+          <Route path="/informasi/bahan-bangunan" element={<BahanBangunanPage />} />
+          <Route path="/informasi/kegiatan-krs" element={<KegiatanKRSPage />} />
+          <Route path="/informasi/perizinan" element={<PerizinanPage />} />
+          <Route path="/informasi/peraturan" element={<PeraturanPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

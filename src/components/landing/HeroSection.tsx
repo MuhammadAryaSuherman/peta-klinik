@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, MapPin, Users, Gift } from 'lucide-react';
+import { ArrowRight, Building2, MapPin, Users, Gift, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import sumateraMapBg from '@/assets/sumatera-map-bg.jpg';
 
@@ -23,14 +23,10 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium animate-fade-in backdrop-blur-sm border border-primary/20">
-              <Building2 className="w-4 h-4" />
-              <span>BP3KP Sumatera II</span>
-            </div>
-
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight animate-slide-up">
               Klinik Perumahan &
               <span className="text-primary block mt-2">Kawasan Permukiman</span>
+              <span className="text-lg md:text-xl lg:text-2xl font-medium text-muted-foreground block mt-4">BP3KP Sumatera II</span>
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
@@ -41,34 +37,19 @@ const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <Link
                 to="/peta/penerima-bsps/medan"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary-hover transition-all shadow-lg hover:shadow-xl hover:shadow-primary/20 group"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary-hover transition-all shadow-lg hover:shadow-xl hover:shadow-primary/20 group"
               >
                 <MapPin className="w-5 h-5" />
                 Lihat Peta Sebaran
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                to="/informasi/tentang"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-secondary-foreground font-semibold rounded-xl hover:bg-secondary/80 transition-all border border-border backdrop-blur-sm"
+                to="/informasi/kontak"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-secondary text-secondary-foreground font-semibold rounded-xl hover:bg-secondary/80 transition-all border border-border backdrop-blur-sm"
               >
-                Pelajari Lebih Lanjut
+                <Phone className="w-5 h-5" />
+                Hubungi Kami
               </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              <div className="text-center sm:text-left">
-                <p className="text-3xl font-bold text-primary">150+</p>
-                <p className="text-sm text-muted-foreground mt-1">Unit Rusun</p>
-              </div>
-              <div className="text-center sm:text-left">
-                <p className="text-3xl font-bold text-primary">10</p>
-                <p className="text-sm text-muted-foreground mt-1">Provinsi</p>
-              </div>
-              <div className="text-center sm:text-left">
-                <p className="text-3xl font-bold text-primary">5K+</p>
-                <p className="text-sm text-muted-foreground mt-1">Penerima BSPS</p>
-              </div>
             </div>
           </div>
 
@@ -80,28 +61,24 @@ const HeroSection = () => {
                 title="Sebaran Rusun"
                 description="Lihat lokasi rusun di wilayah Sumatera"
                 delay="0s"
-                href="/peta/sebaran-rusun/medan"
               />
               <FeatureCard
                 icon={<Building2 className="w-6 h-6" />}
                 title="Kawasan Kumuh"
                 description="Profil dan penanganan kawasan kumuh"
                 delay="0.1s"
-                href="/peta/kawasan-kumuh/medan"
               />
               <FeatureCard
                 icon={<Gift className="w-6 h-6" />}
                 title="Penerima BSPS"
                 description="Bantuan stimulan perumahan swadaya"
                 delay="0.2s"
-                href="/peta/penerima-bsps/medan"
               />
               <FeatureCard
                 icon={<Users className="w-6 h-6" />}
                 title="Sosialisasi"
                 description="Kegiatan edukasi dan sosialisasi"
                 delay="0.3s"
-                href="/sosialisasi-klinik-pkp"
               />
             </div>
           </div>
@@ -118,16 +95,14 @@ const HeroSection = () => {
   );
 };
 
-const FeatureCard = ({ icon, title, description, delay, href }: {
+const FeatureCard = ({ icon, title, description, delay }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   delay: string;
-  href: string;
 }) => (
-  <Link
-    to={href}
-    className="p-6 bg-card/80 backdrop-blur-sm rounded-2xl border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group animate-slide-up block"
+  <div
+    className="p-6 bg-card/80 backdrop-blur-sm rounded-2xl border border-border shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group animate-slide-up"
     style={{ animationDelay: delay }}
   >
     <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
@@ -135,7 +110,7 @@ const FeatureCard = ({ icon, title, description, delay, href }: {
     </div>
     <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{title}</h3>
     <p className="text-sm text-muted-foreground">{description}</p>
-  </Link>
+  </div>
 );
 
 export default HeroSection;

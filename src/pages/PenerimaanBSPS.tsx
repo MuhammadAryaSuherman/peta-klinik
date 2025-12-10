@@ -1,8 +1,30 @@
+import { useState, useMemo } from 'react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import { Gift, FileCheck, Users, ClipboardList, CheckCircle, ArrowRight, AlertCircle, HelpCircle } from 'lucide-react';
+import { Gift, FileCheck, Users, ClipboardList, CheckCircle, ArrowRight, AlertCircle, HelpCircle, MapPin, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+
+interface Penerima {
+  id: number;
+  nama: string;
+  desa: string;
+  kecamatan: string;
+  kabupaten: string;
+  tahun: number;
+  status: 'selesai' | 'proses' | 'rencana';
+}
+
+// Sample data
+const penerimaData: Penerima[] = [
+  { id: 1, nama: 'Ahmad Sulaiman', desa: 'Tanjung Rejo', kecamatan: 'Percut Sei Tuan', kabupaten: 'Deli Serdang', tahun: 2023, status: 'selesai' },
+  { id: 2, nama: 'Siti Aminah', desa: 'Medan Krio', kecamatan: 'Sunggal', kabupaten: 'Deli Serdang', tahun: 2023, status: 'selesai' },
+  { id: 3, nama: 'Budi Santoso', desa: 'Bandar Khalipah', kecamatan: 'Percut Sei Tuan', kabupaten: 'Deli Serdang', tahun: 2024, status: 'proses' },
+  { id: 4, nama: 'Dewi Lestari', desa: 'Helvetia', kecamatan: 'Labuhan Deli', kabupaten: 'Deli Serdang', tahun: 2022, status: 'selesai' },
+  { id: 5, nama: 'Eko Prasetyo', desa: 'Padang Bulan', kecamatan: 'Medan Baru', kabupaten: 'Kota Medan', tahun: 2024, status: 'proses' },
+];
 
 const requirements = [
   'Warga Negara Indonesia (WNI)',
@@ -37,8 +59,46 @@ const faqs = [
   },
 ];
 
+const statusLabels = {
+  selesai: 'Selesai',
+  proses: 'Dalam Proses',
+  rencana: 'Rencana',
+};
+
+const statusColors = {
+  selesai: 'bg-green-500',
+  proses: 'bg-yellow-500',
+  rencana: 'bg-blue-500',
+};
+
 const PenerimaanBSPS = () => {
   const ref = useScrollAnimation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [kabupatenFilter, setKabupatenFilter] = useState<string>('all');
+  const [kecamatanFilter, setKecamatanFilter] = useState<string>('all');
+  const [kelurahanFilter, setKelurahanFilter] = useState<string>('all');
+
+  const kabupatenList = useMemo(() => [...new Set(penerimaData.map(p => p.kabupaten))], []);
+  const kecamatanList = useMemo(() => {
+    const filtered = kabupatenFilter === 'all' ? penerimaData : penerimaData.filter(p => p.kabupaten === kabupatenFilter);
+    return [...new Set(filtered.map(p => p.kecamatan))];
+  }, [kabupatenFilter]);
+  const kelurahanList = useMemo(() => {
+    let filtered = penerimaData;
+    if (kabupatenFilter !== 'all') filtered = filtered.filter(p => p.kabupaten === kabupatenFilter);
+    if (kecamatanFilter !== 'all') filtered = filtered.filter(p => p.kecamatan === kecamatanFilter);
+    return [...new Set(filtered.map(p => p.desa))];
+  }, [kabupatenFilter, kecamatanFilter]);
+
+  const filteredPenerima = useMemo(() => {
+    return penerimaData.filter((p) => {
+      const matchesSearch = !searchQuery || p.nama.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesKabupaten = kabupatenFilter === 'all' || p.kabupaten === kabupatenFilter;
+      const matchesKecamatan = kecamatanFilter === 'all' || p.kecamatan === kecamatanFilter;
+      const matchesKelurahan = kelurahanFilter === 'all' || p.desa === kelurahanFilter;
+      return matchesSearch && matchesKabupaten && matchesKecamatan && matchesKelurahan;
+    });
+  }, [searchQuery, kabupatenFilter, kecamatanFilter, kelurahanFilter]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,6 +119,80 @@ const PenerimaanBSPS = () => {
             </p>
           </div>
 
+          {/* Penerima BSPS Section */}
+          <div className="mb-16 bg-card rounded-2xl border border-border p-6 shadow-lg animate-on-scroll">
+            <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <MapPin className="w-6 h-6 text-primary" />
+              Data Penerima BSPS
+            </h2>
+            
+            {/* Filters */}
+            <div className="grid md:grid-cols-4 gap-4 mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cari nama..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={kabupatenFilter} onValueChange={(v) => { setKabupatenFilter(v); setKecamatanFilter('all'); setKelurahanFilter('all'); }}>
+                <SelectTrigger><SelectValue placeholder="Kabupaten/Kota" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kabupaten/Kota</SelectItem>
+                  {kabupatenList.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={kecamatanFilter} onValueChange={(v) => { setKecamatanFilter(v); setKelurahanFilter('all'); }}>
+                <SelectTrigger><SelectValue placeholder="Kecamatan" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kecamatan</SelectItem>
+                  {kecamatanList.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={kelurahanFilter} onValueChange={setKelurahanFilter}>
+                <SelectTrigger><SelectValue placeholder="Kelurahan/Desa" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kelurahan/Desa</SelectItem>
+                  {kelurahanList.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Nama</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Desa</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Kecamatan</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Kabupaten</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Tahun</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPenerima.map((p) => (
+                    <tr key={p.id} className="border-b border-border/50 hover:bg-secondary/50 transition-colors">
+                      <td className="py-3 px-4 text-foreground">{p.nama}</td>
+                      <td className="py-3 px-4 text-muted-foreground">{p.desa}</td>
+                      <td className="py-3 px-4 text-muted-foreground">{p.kecamatan}</td>
+                      <td className="py-3 px-4 text-muted-foreground">{p.kabupaten}</td>
+                      <td className="py-3 px-4 text-muted-foreground">{p.tahun}</td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded text-white ${statusColors[p.status]}`}>
+                          {statusLabels[p.status]}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           {/* Info Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group">
@@ -66,9 +200,7 @@ const PenerimaanBSPS = () => {
                 <ClipboardList className="w-7 h-7" />
               </div>
               <h3 className="font-semibold text-foreground text-lg mb-2">Persyaratan</h3>
-              <p className="text-muted-foreground">
-                Informasi lengkap persyaratan untuk mendaftar program BSPS.
-              </p>
+              <p className="text-muted-foreground">Informasi lengkap persyaratan untuk mendaftar program BSPS.</p>
             </div>
 
             <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group" style={{ transitionDelay: '0.1s' }}>
@@ -76,9 +208,7 @@ const PenerimaanBSPS = () => {
                 <FileCheck className="w-7 h-7" />
               </div>
               <h3 className="font-semibold text-foreground text-lg mb-2">Prosedur Pendaftaran</h3>
-              <p className="text-muted-foreground">
-                Langkah-langkah untuk mengajukan bantuan BSPS.
-              </p>
+              <p className="text-muted-foreground">Langkah-langkah untuk mengajukan bantuan BSPS.</p>
             </div>
 
             <div className="p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all shadow-lg hover:shadow-xl animate-on-scroll group" style={{ transitionDelay: '0.2s' }}>
@@ -86,9 +216,7 @@ const PenerimaanBSPS = () => {
                 <Users className="w-7 h-7" />
               </div>
               <h3 className="font-semibold text-foreground text-lg mb-2">Kriteria Penerima</h3>
-              <p className="text-muted-foreground">
-                Kriteria masyarakat yang berhak menerima BSPS.
-              </p>
+              <p className="text-muted-foreground">Kriteria masyarakat yang berhak menerima BSPS.</p>
             </div>
           </div>
 
@@ -97,11 +225,7 @@ const PenerimaanBSPS = () => {
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Persyaratan Penerima</h2>
             <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {requirements.map((req, index) => (
-                <div
-                  key={index}
-                  className="flex items-start gap-3 p-4 bg-card rounded-xl border border-border animate-on-scroll"
-                  style={{ transitionDelay: `${index * 0.05}s` }}
-                >
+                <div key={index} className="flex items-start gap-3 p-4 bg-card rounded-xl border border-border animate-on-scroll" style={{ transitionDelay: `${index * 0.05}s` }}>
                   <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-foreground">{req}</span>
                 </div>
@@ -112,41 +236,16 @@ const PenerimaanBSPS = () => {
           {/* Steps */}
           <div className="mb-16">
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Prosedur Pendaftaran</h2>
-            <div className="relative max-w-4xl mx-auto">
-              {/* Connection Line */}
-              <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-accent -translate-y-1/2" />
-              
-              <div className="grid md:grid-cols-3 gap-6">
-                {steps.slice(0, 3).map((step, index) => (
-                  <div
-                    key={step.step}
-                    className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors"
-                    style={{ transitionDelay: `${index * 0.1}s` }}
-                  >
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4 relative z-10">
-                      {step.step}
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {steps.map((step, index) => (
+                <div key={step.step} className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors" style={{ transitionDelay: `${index * 0.1}s` }}>
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4">
+                    {step.step}
                   </div>
-                ))}
-              </div>
-              
-              <div className="grid md:grid-cols-3 gap-6 mt-6">
-                {steps.slice(3).map((step, index) => (
-                  <div
-                    key={step.step}
-                    className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors"
-                    style={{ transitionDelay: `${(index + 3) * 0.1}s` }}
-                  >
-                    <div className="w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4 relative z-10">
-                      {step.step}
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
-                  </div>
-                ))}
-              </div>
+                  <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -155,11 +254,7 @@ const PenerimaanBSPS = () => {
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Pertanyaan Umum</h2>
             <div className="max-w-3xl mx-auto space-y-4">
               {faqs.map((faq, index) => (
-                <div
-                  key={index}
-                  className="p-6 bg-card rounded-2xl border border-border animate-on-scroll hover:border-primary/30 transition-colors"
-                  style={{ transitionDelay: `${index * 0.1}s` }}
-                >
+                <div key={index} className="p-6 bg-card rounded-2xl border border-border animate-on-scroll hover:border-primary/30 transition-colors" style={{ transitionDelay: `${index * 0.1}s` }}>
                   <div className="flex items-start gap-3 mb-3">
                     <HelpCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                     <h3 className="font-semibold text-foreground">{faq.question}</h3>
@@ -171,32 +266,14 @@ const PenerimaanBSPS = () => {
           </div>
 
           {/* CTA */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <Link
-              to="/peta/penerima-bsps/medan"
-              className="p-8 bg-gradient-to-r from-primary to-accent rounded-2xl text-primary-foreground animate-on-scroll group hover:shadow-xl transition-shadow"
-            >
-              <Gift className="w-12 h-12 mb-4 opacity-80" />
-              <h3 className="text-xl font-bold mb-2">Lihat Penerima BSPS</h3>
-              <p className="opacity-80 mb-4">Lihat sebaran penerima BSPS di peta interaktif</p>
-              <div className="flex items-center gap-2 font-medium">
-                <span>Buka Peta</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
+          <div className="p-8 bg-card rounded-2xl border border-border animate-on-scroll text-center">
+            <AlertCircle className="w-12 h-12 text-primary mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-foreground mb-2">Butuh Bantuan?</h3>
+            <p className="text-muted-foreground mb-6">Hubungi kami untuk informasi lebih lanjut tentang program BSPS</p>
+            <Link to="/informasi/kontak" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary-hover transition-colors">
+              Hubungi Kami
+              <ArrowRight className="w-4 h-4" />
             </Link>
-
-            <div className="p-8 bg-card rounded-2xl border border-border animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
-              <AlertCircle className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-bold text-foreground mb-2">Butuh Bantuan?</h3>
-              <p className="text-muted-foreground mb-4">Hubungi kami untuk informasi lebih lanjut tentang program BSPS</p>
-              <Link
-                to="/informasi/kontak"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary-hover transition-colors"
-              >
-                Hubungi Kami
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
           </div>
         </div>
       </main>
