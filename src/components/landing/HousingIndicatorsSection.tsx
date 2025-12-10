@@ -75,7 +75,7 @@ const HousingIndicatorsSection = () => {
   const ref = useScrollAnimation();
 
   return (
-    <section ref={ref} className="py-16 lg:py-24 relative overflow-hidden">
+    <section ref={ref} className="py-12 lg:py-16 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-secondary/60 via-background to-secondary/40 dark:from-background dark:via-primary/5 dark:to-background" />
@@ -92,7 +92,7 @@ const HousingIndicatorsSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 animate-on-scroll">
+        <div className="text-center max-w-2xl mx-auto mb-10 animate-on-scroll">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4 border border-primary/20">
             Indikator Kelayakan
           </span>
@@ -115,22 +115,22 @@ const HousingIndicatorsSection = () => {
                 style={{ transitionDelay: `${index * 0.1}s` }}
               >
                 {/* Image with Icon Overlay */}
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative h-48 overflow-hidden">
                   <img
                     src={indicator.image}
                     alt={indicator.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
                   
-                  {/* Icon Badge - Fully Visible */}
-                  <div className="absolute bottom-4 left-6 w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform z-10">
+                  {/* Icon Badge - Positioned lower and fully visible */}
+                  <div className="absolute bottom-3 left-6 w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform z-10">
                     <IconComponent className="w-7 h-7" />
                   </div>
                 </div>
                 
                 {/* Content */}
-                <div className="p-6 pt-4">
+                <div className="p-6 pt-3">
                   <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-4">
                     {indicator.title}
                   </h3>
