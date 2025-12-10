@@ -2,7 +2,7 @@ import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import { Palette, Download, Eye, Search, BedDouble, Bath, Maximize2, Car, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -20,72 +20,92 @@ const designs = [
     id: 1, 
     title: 'Rumah Tipe 36 Minimalis', 
     category: 'rumah-36', 
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop',
     bedrooms: 2,
     bathrooms: 1,
     area: 36,
     carport: false,
-    previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+    previewImages: [
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
+    ],
     pdfUrl: '/sample.pdf',
   },
   { 
     id: 2, 
     title: 'Rumah Tipe 45 Modern', 
     category: 'rumah-45', 
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop',
     bedrooms: 2,
     bathrooms: 1,
     area: 45,
     carport: true,
-    previewImages: ['/placeholder.svg', '/placeholder.svg'],
+    previewImages: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop',
+    ],
     pdfUrl: '/sample.pdf',
   },
   { 
     id: 3, 
     title: 'Rumah Tipe 54 Tropis', 
     category: 'rumah-54', 
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
     bedrooms: 3,
     bathrooms: 2,
     area: 54,
     carport: true,
-    previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+    previewImages: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&h=600&fit=crop',
+    ],
     pdfUrl: '/sample.pdf',
   },
   { 
     id: 4, 
     title: 'Rusun Blok A', 
     category: 'rusun', 
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop',
     bedrooms: 2,
     bathrooms: 1,
     area: 36,
     carport: false,
-    previewImages: ['/placeholder.svg'],
+    previewImages: [
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop',
+    ],
     pdfUrl: '/sample.pdf',
   },
   { 
     id: 5, 
     title: 'Rumah Tipe 36 Compact', 
     category: 'rumah-36', 
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&h=400&fit=crop',
     bedrooms: 2,
     bathrooms: 1,
     area: 36,
     carport: false,
-    previewImages: ['/placeholder.svg', '/placeholder.svg'],
+    previewImages: [
+      'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&h=600&fit=crop',
+    ],
     pdfUrl: '/sample.pdf',
   },
   { 
     id: 6, 
     title: 'Rumah Tipe 45 Klasik', 
     category: 'rumah-45', 
-    image: '/placeholder.svg',
+    image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=400&fit=crop',
     bedrooms: 3,
     bathrooms: 1,
     area: 45,
     carport: true,
-    previewImages: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+    previewImages: [
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&h=600&fit=crop',
+    ],
     pdfUrl: '/sample.pdf',
   },
 ];
@@ -97,11 +117,13 @@ const BankDesain = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const ref = useScrollAnimation();
 
-  const filteredDesigns = designs.filter((design) => {
-    const matchesCategory = activeCategory === 'all' || design.category === activeCategory;
-    const matchesSearch = design.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredDesigns = useMemo(() => {
+    return designs.filter((design) => {
+      const matchesCategory = activeCategory === 'all' || design.category === activeCategory;
+      const matchesSearch = design.title.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategory, searchQuery]);
 
   const handlePreview = (design: typeof designs[0]) => {
     setPreviewDesign(design);
@@ -126,6 +148,10 @@ const BankDesain = () => {
         prev > 0 ? prev - 1 : previewDesign.previewImages.length - 1
       );
     }
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setActiveCategory(value);
   };
 
   return (
@@ -165,11 +191,11 @@ const BankDesain = () => {
                 className="pl-10"
               />
             </div>
-            <Select value={activeCategory} onValueChange={setActiveCategory}>
+            <Select value={activeCategory} onValueChange={handleCategoryChange}>
               <SelectTrigger className="w-full sm:w-48 bg-card">
                 <SelectValue placeholder="Pilih Tipe" />
               </SelectTrigger>
-              <SelectContent className="bg-popover">
+              <SelectContent className="bg-popover z-50">
                 {categories.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id}>{cat.label}</SelectItem>
                 ))}
@@ -187,7 +213,11 @@ const BankDesain = () => {
               >
                 {/* Thumbnail */}
                 <div className="aspect-video bg-secondary relative overflow-hidden">
-                  <img src={design.image} alt={design.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img 
+                    src={design.image} 
+                    alt={design.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
                 </div>
                 
                 {/* Content */}
@@ -258,7 +288,7 @@ const BankDesain = () => {
           {previewDesign && (
             <div className="relative">
               {/* Main Image */}
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-secondary">
+              <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-secondary">
                 <img 
                   src={previewDesign.previewImages[currentImageIndex]} 
                   alt={`Preview ${currentImageIndex + 1}`} 
@@ -282,6 +312,11 @@ const BankDesain = () => {
                     </button>
                   </>
                 )}
+              </div>
+
+              {/* Image Counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-background/80 rounded-full text-sm text-foreground">
+                {currentImageIndex + 1} / {previewDesign.previewImages.length}
               </div>
               
               {/* Dots Indicator */}

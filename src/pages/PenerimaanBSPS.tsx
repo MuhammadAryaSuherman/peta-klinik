@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import { Gift, FileCheck, Users, ClipboardList, CheckCircle, ArrowRight, AlertCircle, HelpCircle, MapPin, Search } from 'lucide-react';
+import { Gift, FileCheck, Users, ClipboardList, CheckCircle, ArrowRight, AlertCircle, MapPin, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -103,21 +103,6 @@ const steps = [
   { step: 4, title: 'Pencairan', description: 'Bantuan disalurkan secara bertahap sesuai progres' },
   { step: 5, title: 'Pembangunan', description: 'Pelaksanaan pembangunan dengan pendampingan' },
   { step: 6, title: 'Serah Terima', description: 'Verifikasi akhir dan serah terima rumah' },
-];
-
-const faqs = [
-  {
-    question: 'Berapa nilai bantuan BSPS yang diberikan?',
-    answer: 'Nilai bantuan BSPS bervariasi tergantung jenis bantuan, mulai dari Rp 17,5 juta untuk Peningkatan Kualitas hingga Rp 40 juta untuk Pembangunan Baru.',
-  },
-  {
-    question: 'Apakah bantuan BSPS harus dikembalikan?',
-    answer: 'Tidak, bantuan BSPS bersifat stimulan (hibah) dan tidak perlu dikembalikan kepada pemerintah.',
-  },
-  {
-    question: 'Bagaimana cara mengecek status pendaftaran?',
-    answer: 'Status pendaftaran dapat dicek melalui kantor desa/kelurahan atau menghubungi kantor BP3KP setempat.',
-  },
 ];
 
 const PenerimaanBSPS = () => {
@@ -249,9 +234,9 @@ const PenerimaanBSPS = () => {
       <main ref={ref} className="pt-24 pb-16">
         {/* Background Pattern */}
         <div className="fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/80 via-background to-accent-2/20 dark:from-background dark:via-primary/5 dark:to-accent/5" />
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-2/10 rounded-full blur-3xl" />
         </div>
 
         <div className="container mx-auto px-4">
@@ -289,21 +274,21 @@ const PenerimaanBSPS = () => {
               </div>
               <Select value={kabupatenFilter} onValueChange={(v) => { setKabupatenFilter(v); setKecamatanFilter('all'); setKelurahanFilter('all'); }}>
                 <SelectTrigger><SelectValue placeholder="Kabupaten/Kota" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">Semua Kabupaten/Kota</SelectItem>
                   {kabupatenList.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
                 </SelectContent>
               </Select>
               <Select value={kecamatanFilter} onValueChange={(v) => { setKecamatanFilter(v); setKelurahanFilter('all'); }}>
                 <SelectTrigger><SelectValue placeholder="Kecamatan" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">Semua Kecamatan</SelectItem>
                   {kecamatanList.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
                 </SelectContent>
               </Select>
               <Select value={kelurahanFilter} onValueChange={setKelurahanFilter}>
                 <SelectTrigger><SelectValue placeholder="Kelurahan/Desa" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">Semua Kelurahan/Desa</SelectItem>
                   {kelurahanList.map(k => <SelectItem key={k} value={k}>{k}</SelectItem>)}
                 </SelectContent>
@@ -380,23 +365,16 @@ const PenerimaanBSPS = () => {
             </div>
           </div>
 
-          {/* Steps */}
+          {/* Steps - 3 columns, 2 rows */}
           <div id="prosedur" className="mb-16 scroll-mt-24">
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">Prosedur Pendaftaran</h2>
             <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {steps.slice(0, 3).map((step, index) => (
-                <div key={step.step} className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors" style={{ transitionDelay: `${index * 0.1}s` }}>
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4">
-                    {step.step}
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
-                </div>
-              ))}
-            </div>
-            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-6">
-              {steps.slice(3).map((step, index) => (
-                <div key={step.step} className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors" style={{ transitionDelay: `${(index + 3) * 0.1}s` }}>
+              {steps.map((step, index) => (
+                <div 
+                  key={step.step} 
+                  className="relative p-6 bg-card rounded-2xl border border-border text-center animate-on-scroll hover:border-primary/30 transition-colors" 
+                  style={{ transitionDelay: `${index * 0.1}s` }}
+                >
                   <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold text-lg mx-auto mb-4">
                     {step.step}
                   </div>

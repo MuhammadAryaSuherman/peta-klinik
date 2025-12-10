@@ -44,7 +44,7 @@ const BuildingStepsSection = () => {
   const ref = useScrollAnimation();
 
   return (
-    <section ref={ref} className="py-16 lg:py-24 relative overflow-hidden">
+    <section ref={ref} className="py-12 lg:py-16 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-accent-2/20 via-background to-secondary/40 dark:from-primary/5 dark:via-background dark:to-accent/5" />
@@ -62,7 +62,7 @@ const BuildingStepsSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 animate-on-scroll">
+        <div className="text-center max-w-2xl mx-auto mb-10 animate-on-scroll">
           <span className="inline-block px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4 border border-primary/20">
             Panduan Pembangunan
           </span>
@@ -74,48 +74,55 @@ const BuildingStepsSection = () => {
           </p>
         </div>
 
-        {/* Steps Timeline */}
+        {/* Steps Grid with Connected Timeline */}
         <div className="relative max-w-6xl mx-auto">
-          {/* Connection Line - Vertical for mobile/tablet, horizontal for desktop */}
-          <div className="hidden lg:block absolute top-[88px] left-[calc(16.67%-20px)] right-[calc(16.67%-20px)] h-1 bg-gradient-to-r from-primary via-accent to-primary rounded-full z-0" />
+          {/* Vertical timeline line for the entire grid */}
+          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-primary via-accent to-green-500 rounded-full transform -translate-x-1/2 z-0" />
           
-          {/* Vertical connection lines between rows on desktop */}
-          <div className="hidden lg:block absolute left-[calc(16.67%)] top-[88px] w-1 h-[calc(100%-176px)] bg-gradient-to-b from-primary to-accent rounded-full z-0" style={{ left: 'calc(16.67% - 2px)' }} />
-          <div className="hidden lg:block absolute right-[calc(16.67%)] top-[88px] w-1 h-[calc(100%-176px)] bg-gradient-to-b from-primary to-accent rounded-full z-0" style={{ right: 'calc(16.67% - 2px)' }} />
-          
-          {/* Second row horizontal line */}
-          <div className="hidden lg:block absolute bottom-[112px] left-[calc(16.67%-20px)] right-[calc(16.67%-20px)] h-1 bg-gradient-to-r from-accent via-primary to-accent rounded-full z-0" />
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+          {/* Steps */}
+          <div className="relative z-10 space-y-6">
             {steps.map((item, index) => {
               const IconComponent = item.icon;
               const isLast = item.step === 'AKHIR';
+              const isEven = index % 2 === 0;
+              
               return (
                 <div
                   key={index}
-                  className="relative animate-on-scroll"
+                  className={`flex items-center gap-6 animate-on-scroll ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}
                   style={{ transitionDelay: `${index * 0.1}s` }}
                 >
-                  <div className={`bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group h-[200px] flex flex-col ${isLast ? 'ring-2 ring-accent-2/50' : ''}`}>
-                    {/* Step Number with Icon */}
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="relative flex-shrink-0">
-                        <div className={`w-16 h-16 ${isLast ? 'bg-gradient-to-br from-accent-2 to-primary' : 'bg-gradient-to-br from-primary to-accent'} rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform`}>
+                  {/* Content Card */}
+                  <div className={`flex-1 ${isEven ? 'md:text-right' : 'md:text-left'}`}>
+                    <div className={`bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all duration-300 group inline-block w-full max-w-md ${isEven ? 'md:ml-auto' : 'md:mr-auto'} ${isLast ? 'ring-2 ring-green-500/50' : ''}`}>
+                      <div className={`flex items-center gap-4 mb-3 ${isEven ? 'md:flex-row-reverse' : ''}`}>
+                        <div className={`w-14 h-14 ${isLast ? 'bg-gradient-to-br from-green-500 to-green-600' : 'bg-gradient-to-br from-primary to-accent'} rounded-xl flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-110 transition-transform flex-shrink-0`}>
                           <IconComponent className="w-7 h-7" />
                         </div>
-                        <div className={`absolute -top-2 -right-2 ${isLast ? 'w-auto px-2' : 'w-8'} h-8 ${isLast ? 'bg-green-500' : 'bg-accent-2'} rounded-full flex items-center justify-center text-white font-bold text-xs shadow`}>
-                          {item.step}
+                        <div className={isEven ? 'md:text-right' : ''}>
+                          <span className={`text-xs font-bold ${isLast ? 'text-green-500' : 'text-primary'}`}>
+                            {typeof item.step === 'number' ? `Langkah ${item.step}` : item.step}
+                          </span>
+                          <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {item.title}
+                          </h3>
                         </div>
                       </div>
-                      <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-                        {item.title}
-                      </h3>
+                      <p className={`text-muted-foreground text-sm ${isEven ? 'md:text-right' : ''}`}>
+                        {item.description}
+                      </p>
                     </div>
-                    
-                    <p className="text-muted-foreground leading-relaxed flex-1">
-                      {item.description}
-                    </p>
                   </div>
+
+                  {/* Center Point */}
+                  <div className="hidden md:flex items-center justify-center relative z-20">
+                    <div className={`w-10 h-10 ${isLast ? 'bg-green-500' : 'bg-primary'} rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg border-4 border-background`}>
+                      {typeof item.step === 'number' ? item.step : '✓'}
+                    </div>
+                  </div>
+
+                  {/* Empty space for layout */}
+                  <div className="flex-1 hidden md:block" />
                 </div>
               );
             })}

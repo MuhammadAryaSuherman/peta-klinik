@@ -1,33 +1,21 @@
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import { Phone, Mail, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
+import { Phone, Mail, MapPin, MessageSquare } from 'lucide-react';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
-import { toast } from 'sonner';
-
-const contactInfo = [
-  { icon: Phone, title: 'Telepon', value: '(061) 123-4567', description: 'Senin - Jumat, 08:00 - 16:00' },
-  { icon: Mail, title: 'Email', value: 'info@bp3kp-sumut2.go.id', description: 'Respon dalam 1-2 hari kerja' },
-  { icon: MapPin, title: 'Alamat', value: 'Jl. Karya Rakyat, Medan', description: 'Sumatera Utara, Indonesia' },
-  { icon: Clock, title: 'Jam Operasional', value: 'Senin - Jumat', description: '08:00 - 16:00 WIB' },
-];
 
 const KontakPage = () => {
   const ref = useScrollAnimation();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success('Pesan Anda telah terkirim! Kami akan segera menghubungi Anda.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
+  const handlePhoneClick = () => {
+    window.location.href = 'tel:+62611234567';
+  };
+
+  const handleEmailClick = () => {
+    window.location.href = 'mailto:info@bp3kp-sumut2.go.id';
+  };
+
+  const handleWhatsAppClick = () => {
+    window.open('https://wa.me/62611234567', '_blank');
   };
 
   return (
@@ -36,7 +24,7 @@ const KontakPage = () => {
       <main ref={ref} className="pt-24 pb-16">
         {/* Background Pattern */}
         <div className="fixed inset-0 -z-10 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent-2/10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/80 via-background to-accent-2/20 dark:from-background dark:via-primary/5 dark:to-accent/5" />
           <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-accent-2/10 rounded-full blur-3xl" />
         </div>
@@ -56,134 +44,92 @@ const KontakPage = () => {
             </p>
           </div>
 
-          {/* Contact Info Cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            {contactInfo.map((info, index) => {
-              const IconComponent = info.icon;
-              return (
-                <div 
-                  key={index}
-                  className="bg-card rounded-2xl border border-border p-6 shadow-lg hover:shadow-xl hover:border-primary/30 transition-all animate-on-scroll group"
-                  style={{ transitionDelay: `${index * 0.1}s` }}
-                >
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground mb-4 group-hover:scale-110 transition-transform">
-                    <IconComponent className="w-7 h-7" />
-                  </div>
-                  <h3 className="font-semibold text-foreground text-lg mb-1">{info.title}</h3>
-                  <p className="text-primary font-medium mb-1">{info.value}</p>
-                  <p className="text-muted-foreground text-sm">{info.description}</p>
-                </div>
-              );
-            })}
+          {/* Contact Cards */}
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {/* Phone Card */}
+            <button 
+              onClick={handlePhoneClick}
+              className="bg-card rounded-2xl border border-border p-8 shadow-lg hover:shadow-2xl hover:border-primary/30 transition-all animate-on-scroll group text-left"
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-primary-foreground mb-6 group-hover:scale-110 transition-transform">
+                <Phone className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-foreground text-xl mb-2">Telepon</h3>
+              <p className="text-primary font-semibold text-lg mb-2">(061) 123-4567</p>
+              <p className="text-muted-foreground text-sm">Senin - Jumat, 08:00 - 16:00 WIB</p>
+              <div className="mt-4 text-primary text-sm font-medium group-hover:underline">
+                Klik untuk menelepon →
+              </div>
+            </button>
+
+            {/* Email Card */}
+            <button 
+              onClick={handleEmailClick}
+              className="bg-card rounded-2xl border border-border p-8 shadow-lg hover:shadow-2xl hover:border-primary/30 transition-all animate-on-scroll group text-left"
+              style={{ transitionDelay: '0.1s' }}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-accent to-primary rounded-2xl flex items-center justify-center text-primary-foreground mb-6 group-hover:scale-110 transition-transform">
+                <Mail className="w-8 h-8" />
+              </div>
+              <h3 className="font-bold text-foreground text-xl mb-2">Email</h3>
+              <p className="text-primary font-semibold text-lg mb-2">info@bp3kp-sumut2.go.id</p>
+              <p className="text-muted-foreground text-sm">Respon dalam 1-2 hari kerja</p>
+              <div className="mt-4 text-primary text-sm font-medium group-hover:underline">
+                Klik untuk mengirim email →
+              </div>
+            </button>
+
+            {/* WhatsApp Card */}
+            <button 
+              onClick={handleWhatsAppClick}
+              className="bg-card rounded-2xl border border-border p-8 shadow-lg hover:shadow-2xl hover:border-green-500/30 transition-all animate-on-scroll group text-left"
+              style={{ transitionDelay: '0.2s' }}
+            >
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </div>
+              <h3 className="font-bold text-foreground text-xl mb-2">WhatsApp</h3>
+              <p className="text-green-500 font-semibold text-lg mb-2">+62 61 123-4567</p>
+              <p className="text-muted-foreground text-sm">Chat langsung dengan tim kami</p>
+              <div className="mt-4 text-green-500 text-sm font-medium group-hover:underline">
+                Klik untuk chat WhatsApp →
+              </div>
+            </button>
           </div>
 
-          {/* Contact Form & Map */}
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Contact Form */}
-            <div className="bg-card rounded-2xl border border-border p-8 shadow-lg animate-on-scroll">
-              <h2 className="text-2xl font-bold text-foreground mb-6">Kirim Pesan</h2>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Nama Lengkap</label>
-                    <Input
-                      placeholder="Masukkan nama Anda"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                      className="bg-background"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                    <Input
-                      type="email"
-                      placeholder="Masukkan email Anda"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      required
-                      className="bg-background"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Subjek</label>
-                  <Input
-                    placeholder="Subjek pesan"
-                    value={formData.subject}
-                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    required
-                    className="bg-background"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Pesan</label>
-                  <Textarea
-                    placeholder="Tulis pesan Anda..."
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    required
-                    rows={5}
-                    className="bg-background resize-none"
-                  />
-                </div>
-                <Button type="submit" className="w-full py-6 text-lg font-semibold">
-                  <Send className="w-5 h-5 mr-2" />
-                  Kirim Pesan
-                </Button>
-              </form>
-            </div>
-
-            {/* Map & Additional Info */}
-            <div className="space-y-6 animate-on-scroll" style={{ transitionDelay: '0.2s' }}>
-              {/* Map Placeholder */}
-              <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-lg h-[300px]">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3981.9854654987656!2d98.66!3d3.6!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM8KwMzYnMDAuMCJOIDk4wrAzOSczNi4wIkU!5e0!3m2!1sen!2sid!4v1600000000000!5m2!1sen!2sid"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
+          {/* Address Section */}
+          <div className="mt-16 max-w-2xl mx-auto text-center animate-on-scroll" style={{ transitionDelay: '0.3s' }}>
+            <div className="bg-card rounded-2xl border border-border p-8 shadow-lg">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center text-primary-foreground mx-auto mb-6">
+                <MapPin className="w-8 h-8" />
               </div>
+              <h3 className="font-bold text-foreground text-xl mb-2">Alamat Kantor</h3>
+              <p className="text-muted-foreground text-lg mb-4">
+                Jl. Karya Rakyat No. 123<br />
+                Medan, Sumatera Utara<br />
+                Indonesia
+              </p>
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=3.5952,98.6722"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
+              >
+                Lihat di Google Maps →
+              </a>
+            </div>
+          </div>
 
-              {/* Working Hours */}
-              <div className="bg-card rounded-2xl border border-border p-6 shadow-lg">
-                <h3 className="font-semibold text-foreground text-lg mb-4 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-primary" />
-                  Jam Operasional
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center py-2 border-b border-border">
-                    <span className="text-foreground">Senin - Kamis</span>
-                    <span className="text-primary font-medium">07:30 - 16:00</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-border">
-                    <span className="text-foreground">Jumat</span>
-                    <span className="text-primary font-medium">07:30 - 16:30</span>
-                  </div>
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-foreground">Sabtu - Minggu</span>
-                    <span className="text-destructive font-medium">Tutup</span>
-                  </div>
-                </div>
-                
-                {/* Ramadan Hours */}
-                <div className="mt-6 pt-4 border-t border-border">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3">Jam Puasa (Ramadhan)</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">Senin - Kamis</span>
-                      <span className="text-primary">08:00 - 16:00</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground">Jumat</span>
-                      <span className="text-primary">08:00 - 16:30</span>
-                    </div>
-                  </div>
-                </div>
+          {/* Bahan Bangunan Section */}
+          <div className="mt-16 max-w-4xl mx-auto animate-on-scroll" style={{ transitionDelay: '0.4s' }}>
+            <div className="bg-card rounded-2xl border border-border p-8 shadow-lg">
+              <h3 className="font-bold text-foreground text-2xl mb-6 text-center">Spesifikasi Bahan Bangunan</h3>
+              <div className="prose prose-lg max-w-none text-muted-foreground">
+                <p className="leading-relaxed">
+                  Pondasi menggunakan batu kali sebagai penahan beban utama, pasir urug untuk meratakan dasar, serta batu kosong sebagai aanstamping, semuanya direkatkan dengan adukan semen–pasir 1:5. Struktur seperti sloof, kolom, ring balok, dan balok lintel menggunakan beton dengan campuran 1:2:3, diperkuat tulangan utama Ø10 mm dan begel Ø8 mm berjarak sekitar 15 cm. Dinding memakai bata merah dengan adukan 1:4 dan diperkuat angkur besi Ø10 mm setiap enam lapis bata. Pada struktur atap kayu, elemen kuda-kuda, gording, dan balok tarik diperkuat dengan plat baja 4 mm atau papan tebal 20 mm menggunakan baut Ø10 mm, sedangkan penutup atap dapat berupa genteng atau seng sesuai standar konstruksi dalam dokumen.
+                </p>
               </div>
             </div>
           </div>

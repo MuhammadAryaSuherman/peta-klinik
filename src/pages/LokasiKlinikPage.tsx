@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import { MapPin, Clock, Phone, Mail, Calendar, ExternalLink } from 'lucide-react';
+import { MapPin, Clock, Phone, Mail, ExternalLink } from 'lucide-react';
 import useScrollAnimation from '@/hooks/useScrollAnimation';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -12,14 +12,9 @@ const klinikData = {
   coordinates: [3.5952, 98.6722] as [number, number],
   phone: '(061) 123-4567',
   email: 'klinikpkp@bp3kp.go.id',
-  normalHours: [
+  operationalHours: [
     { day: 'Senin - Kamis', hours: '07.30 - 16.00 WIB' },
     { day: 'Jumat', hours: '07.30 - 16.30 WIB' },
-    { day: 'Sabtu - Minggu', hours: 'Tutup / Libur' },
-  ],
-  fastingHours: [
-    { day: 'Senin - Kamis', hours: '08.00 - 16.00 WIB' },
-    { day: 'Jumat', hours: '08.00 - 16.30 WIB' },
     { day: 'Sabtu - Minggu', hours: 'Tutup / Libur' },
   ],
   services: [
@@ -57,34 +52,26 @@ const LokasiKlinikPage = () => {
 
     // Add radius circle
     L.circle(klinikData.coordinates, {
-      radius: 200,
+      radius: 300,
       color: 'hsl(191, 79%, 25%)',
       fillColor: 'hsl(191, 79%, 25%)',
-      fillOpacity: 0.15,
+      fillOpacity: 0.2,
+      weight: 3,
+    }).addTo(map);
+
+    // Smaller inner circle for center point
+    L.circle(klinikData.coordinates, {
+      radius: 50,
+      color: 'hsl(191, 79%, 25%)',
+      fillColor: 'hsl(191, 79%, 35%)',
+      fillOpacity: 0.6,
       weight: 2,
     }).addTo(map);
 
-    // Center marker
-    const markerIcon = L.divIcon({
-      html: `
-        <div class="relative flex items-center justify-center">
-          <div class="absolute w-16 h-16 bg-primary/20 rounded-full animate-ping"></div>
-          <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-xl border-4 border-white z-10">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-          </div>
-        </div>
-      `,
-      className: 'custom-marker',
-      iconSize: [64, 64],
-      iconAnchor: [32, 32],
-    });
-
-    L.marker(klinikData.coordinates, { icon: markerIcon })
-      .addTo(map)
-      .bindPopup(`
+    // Popup on center
+    L.popup()
+      .setLatLng(klinikData.coordinates)
+      .setContent(`
         <div class="p-4 min-w-[280px]">
           <h3 class="font-bold text-lg text-gray-900 mb-2">${klinikData.name}</h3>
           <p class="text-sm text-gray-600 mb-3">${klinikData.address}</p>
@@ -97,7 +84,8 @@ const LokasiKlinikPage = () => {
             Buka di Google Maps
           </button>
         </div>
-      `);
+      `)
+      .openOn(map);
 
     return () => {
       map.remove();
@@ -132,7 +120,7 @@ const LokasiKlinikPage = () => {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 mb-12">
-            {/* Map with Building Image */}
+            {/* Map Section */}
             <div className="space-y-6 animate-on-scroll">
               <div 
                 ref={mapRef} 
@@ -150,13 +138,16 @@ const LokasiKlinikPage = () => {
               
               {/* Building Image */}
               <div className="rounded-2xl overflow-hidden shadow-xl border border-border">
-                <div className="relative aspect-video bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <MapPin className="w-10 h-10 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">Gedung Balai BP3KP</h3>
-                    <p className="text-muted-foreground">Tampak Depan Bangunan</p>
+                <div className="relative aspect-video bg-gradient-to-br from-primary/10 to-accent/10">
+                  <img 
+                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=450&fit=crop" 
+                    alt="Gedung Balai BP3KP Tampak Depan"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-lg font-bold">Gedung Balai BP3KP</h3>
+                    <p className="text-sm opacity-90">Tampak Depan Bangunan</p>
                   </div>
                 </div>
               </div>
@@ -177,7 +168,7 @@ const LokasiKlinikPage = () => {
                 </div>
               </div>
 
-              {/* Operational Hours - Normal */}
+              {/* Operational Hours */}
               <div className="p-6 bg-card rounded-2xl border border-border shadow-lg animate-on-scroll hover:shadow-xl transition-shadow" style={{ transitionDelay: '0.1s' }}>
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-14 h-14 bg-gradient-to-br from-accent to-primary rounded-xl flex items-center justify-center text-primary-foreground flex-shrink-0">
@@ -185,34 +176,10 @@ const LokasiKlinikPage = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-foreground text-lg mb-1">Jam Operasional</h3>
-                    <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">Hari Biasa</span>
                   </div>
                 </div>
                 <div className="space-y-3 ml-[4.5rem]">
-                  {klinikData.normalHours.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
-                      <span className="text-foreground font-medium">{item.day}</span>
-                      <span className={`text-sm ${item.hours.includes('Tutup') ? 'text-destructive' : 'text-primary font-semibold'}`}>
-                        {item.hours}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Operational Hours - Fasting */}
-              <div className="p-6 bg-card rounded-2xl border border-border shadow-lg animate-on-scroll hover:shadow-xl transition-shadow" style={{ transitionDelay: '0.15s' }}>
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-accent-2 to-primary rounded-xl flex items-center justify-center text-primary-foreground flex-shrink-0">
-                    <Calendar className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-foreground text-lg mb-1">Jam Operasional</h3>
-                    <span className="text-xs px-2 py-1 bg-accent-2/20 text-accent-2-foreground dark:text-accent-2 rounded-full">Bulan Ramadhan</span>
-                  </div>
-                </div>
-                <div className="space-y-3 ml-[4.5rem]">
-                  {klinikData.fastingHours.map((item, index) => (
+                  {klinikData.operationalHours.map((item, index) => (
                     <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
                       <span className="text-foreground font-medium">{item.day}</span>
                       <span className={`text-sm ${item.hours.includes('Tutup') ? 'text-destructive' : 'text-primary font-semibold'}`}>
@@ -251,7 +218,7 @@ const LokasiKlinikPage = () => {
           <div className="bg-card rounded-2xl border border-border p-8 shadow-lg animate-on-scroll">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center text-primary-foreground">
-                <Calendar className="w-6 h-6" />
+                <MapPin className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-foreground">Layanan yang Tersedia</h3>
             </div>
@@ -267,28 +234,6 @@ const LokasiKlinikPage = () => {
         </div>
       </main>
       <Footer />
-
-      <style>{`
-        .custom-marker {
-          background: transparent;
-          border: none;
-        }
-        .custom-marker > div > div:not(.absolute) {
-          background: hsl(191, 79%, 25%);
-        }
-        .custom-marker svg {
-          color: white;
-        }
-        @keyframes ping {
-          75%, 100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-        .animate-ping {
-          animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-      `}</style>
     </div>
   );
 };
